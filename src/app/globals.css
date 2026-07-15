@@ -1,0 +1,27 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-display: "Cormorant Garamond", serif;
+  --font-body: "Jost", sans-serif;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: theme("colors.parchment");
+  color: theme("colors.ink");
+}
+
+.dark body {
+  background-color: theme("colors.ink");
+  color: theme("colors.parchment");
+}
+
+::selection {
+  background-color: theme("colors.gold.light");
+  color: theme("colors.ink");
+}
