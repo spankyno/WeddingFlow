@@ -1,0 +1,95 @@
+import { eq } from "drizzle-orm";
+import { getDb } from "@/lib/db/client";
+import { events, eventThemes, eventSections, sectionKeyEnum } from "@drizzle/schema";
+import type { CreateEventInput } from "@/lib/validators/event";
+import { nanoid } from "@/lib/utils";
+
+const DEFAULT_ENABLED_SECTIONS = [
+  "story",
+  "countdown",
+  "gallery",
+  "map",
+  "agenda",
+  "rsvp",
+  "faq",
+] as const;
+
+function slugify(title: string) {
+  return (
+    title
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/(^-|-$)/g, "") +
+    "-" +
+    nanoid(6)
+  );
+}
+
+export async function listEventsForUser(userId: string) {
+  const db = getDb();
+  return db.select().from(events).where(eq(events.ownerUserId, userId)).all();
+}
+
+export async function getEventById(eventId: string) {
+  const db = getDb();
+  return db.select().from(events).where(eq(events.id, eventId)).get();
+}
+
+export async function getEventBySlug(slug: string) {
+  const db = getDb();
+  return db.select().from(events).where(eq(events.slug, slug)).get();
+}
+
+/**
+ * Crea un evento con sus registros relacionados 1:1 por defecto (tema, secciones activas).
+ * Es el punto de entrada del wizard (paso 1 → esto se llama al pulsar "Continuar").
+ */
+export async function createEvent(userId: string, input: CreateEventInput) {
+  const db = getDb();
+  const id = nanoid();
+  const slug = slugify(input.title);
+
+  await db.insert(events).values({
+    id,
+    ownerUserId: userId,
+    eventType: input.eventType,
+    slug,
+    title: input.title,
+    eventDate: input.eventDate,
+    eventTime: input.eventTime,
+    ceremonyLocationName: input.ceremonyLocationName,
+    ceremonyLat: input.ceremonyLat,
+    ceremonyLng: input.ceremonyLng,
+    celebrationLocationName: input.celebrationLocationName,
+    celebrationLat: input.celebrationLat,
+    celebrationLng: input.celebrationLng,
+    storyText: input.storyText,
+    status: "draft",
+  });
+
+  await db.insert(eventThemes).values({
+    id: nanoid(),
+    eventId: id,
+    themePreset: "elegante",
+  });
+
+  await db.insert(eventSections).values(
+    sectionKeyEnum.map((key, index) => ({
+      id: nanoid(),
+      eventId: id,
+      sectionKey: key,
+      isEnabled: (DEFAULT_ENABLED_SECTIONS as readonly string[]).includes(key),
+      sortOrder: index,
+    }))
+  );
+
+  return { id, slug };
+}
+
+export async function deleteEvent(eventId: string, userId: string) {
+  const db = getDb();
+  // onDelete: cascade en el esquema limpia todas las tablas hijas (invitados, mesas, etc.)
+  await db.delete(events).where(eq(events.id, eventId));
+}
