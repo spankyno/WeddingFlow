@@ -10,10 +10,11 @@ const nextConfig = {
   },
 };
 
-module.exports = nextConfig;
-
-// Habilita utilidades de desarrollo local de Cloudflare (bindings D1/R2 en `next dev`)
+// Habilita en `next dev` el acceso a los bindings reales de Cloudflare (D1, R2...)
+// tal y como se comportarán en producción, vía Miniflare.
 if (process.env.NODE_ENV === "development") {
-  const { setupDevPlatform } = require("@cloudflare/next-on-pages/next-dev");
-  setupDevPlatform();
+  const { initOpenNextCloudflareForDev } = require("@opennextjs/cloudflare");
+  initOpenNextCloudflareForDev();
 }
+
+module.exports = nextConfig;

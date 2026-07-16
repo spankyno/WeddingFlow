@@ -8,8 +8,10 @@
     "start": "next start",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
-    "pages:build": "npx @cloudflare/next-on-pages",
-    "pages:deploy": "npm run pages:build && wrangler pages deploy .vercel/output/static",
+    "cf:build": "opennextjs-cloudflare build",
+    "cf:preview": "npm run cf:build && opennextjs-cloudflare preview",
+    "cf:deploy": "npm run cf:build && opennextjs-cloudflare deploy",
+    "cf:typegen": "wrangler types --env-interface CloudflareEnv cloudflare-env.d.ts",
     "db:generate": "drizzle-kit generate",
     "db:migrate:local": "wrangler d1 migrations apply weddingflow-db --local",
     "db:migrate:remote": "wrangler d1 migrations apply weddingflow-db --remote",
@@ -34,7 +36,8 @@
     "@dnd-kit/sortable": "^8.0.0",
     "date-fns": "^4.1.0",
     "qrcode": "^1.5.4",
-    "svix": "^1.36.0"
+    "svix": "^1.36.0",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "typescript": "^5.6.3",
@@ -46,8 +49,8 @@
     "postcss": "^8.4.47",
     "autoprefixer": "^10.4.20",
     "drizzle-kit": "^0.28.0",
-    "wrangler": "^3.83.0",
-    "@cloudflare/next-on-pages": "^1.13.5",
+    "wrangler": "^4.0.0",
+    "@opennextjs/cloudflare": "^1.0.0",
     "@cloudflare/workers-types": "^4.20241022.0",
     "eslint": "^9.13.0",
     "eslint-config-next": "15.1.0",
