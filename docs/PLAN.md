@@ -13,9 +13,14 @@
 - **Colas / tareas diferidas** (recordatorios, envío de emails): Cloudflare Queues + Cron Triggers
 - **Email**: Resend (plan gratuito) vía Cloudflare Worker
 - **WhatsApp**: WhatsApp Cloud API (Meta, tier gratuito) — enlace `wa.me` como fallback sin coste
-- **Despliegue**: Cloudflare Pages + Pages Functions
+- **Despliegue**: Cloudflare Workers, vía el adaptador **`@opennextjs/cloudflare`**
 
-> Nota técnica: Next.js en Cloudflare Pages requiere el adaptador `@cloudflare/next-on-pages`. Esto impone restricciones: **no** se puede usar el runtime "Node.js" completo en rutas (hay que usar `export const runtime = 'edge'` en todas las rutas dinámicas), y algunas librerías Node-only no son compatibles. Se ha tenido esto en cuenta en la arquitectura de carpetas.
+> Nota técnica (actualizada): la vía recomendada hoy por Cloudflare y por el propio equipo
+> de Next.js para desplegar Next.js en Cloudflare es **Workers + OpenNext**, no Cloudflare
+> Pages con `@cloudflare/next-on-pages` (ese paquete quedó en modo mantenimiento). Con
+> OpenNext las rutas corren en un runtime compatible con Node.js sobre Workers (flag
+> `nodejs_compat`), por lo que **ya no hace falta** forzar `export const runtime = 'edge'`
+> en cada ruta dinámica, a diferencia de lo que exigía next-on-pages.
 
 ---
 
