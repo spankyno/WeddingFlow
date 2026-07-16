@@ -93,3 +93,14 @@ export async function deleteEvent(eventId: string, userId: string) {
   // onDelete: cascade en el esquema limpia todas las tablas hijas (invitados, mesas, etc.)
   await db.delete(events).where(eq(events.id, eventId));
 }
+
+/**
+ * Comprueba que el evento existe y pertenece al usuario autenticado.
+ * Se usa al entrar en cualquier ruta de sub-recurso (invitados, mesas, regalos...)
+ * para no depender solo del middleware de Clerk, que únicamente valida sesión, no propiedad.
+ */
+export async function assertEventOwnership(eventId: string, userId: string) {
+  const event = await getEventById(eventId);
+  if (!event || event.ownerUserId !== userId) return null;
+  return event;
+}

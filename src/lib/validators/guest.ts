@@ -1,0 +1,41 @@
+import { z } from "zod";
+
+export const createGuestSchema = z.object({
+  fullName: z.string().min(2, "El nombre es obligatorio").max(150),
+  email: z.string().email("Email inválido").optional().or(z.literal("")),
+  phone: z.string().max(30).optional().or(z.literal("")),
+  isVip: z.boolean().default(false),
+  isChild: z.boolean().default(false),
+  maxCompanions: z.coerce.number().int().min(0).max(20).default(0),
+  groupName: z.string().max(120).optional().or(z.literal("")),
+});
+
+export type CreateGuestInput = z.infer<typeof createGuestSchema>;
+
+export const updateGuestSchema = createGuestSchema.partial().extend({
+  tableId: z.string().nullable().optional(),
+  rsvpStatus: z.enum(["pending", "confirmed", "declined"]).optional(),
+});
+
+export type UpdateGuestInput = z.infer<typeof updateGuestSchema>;
+
+// Fila normalizada tal y como llega desde el mapeo de columnas del Excel en el cliente.
+// El límite de 500 evita imports descontrolados; para volúmenes mayores se recomienda
+// trocear el archivo en varias tandas desde el propio diálogo de importación.
+export const bulkImportGuestsSchema = z.object({
+  guests: z.array(createGuestSchema).min(1, "El archivo no contiene filas válidas").max(500),
+});
+
+export type BulkImportGuestsInput = z.infer<typeof bulkImportGuestsSchema>;
+
+// Claves de columna reconocidas al mapear cabeceras del Excel/CSV subido.
+// Se usa para el auto-detect en el diálogo de importación (case-insensitive, sin acentos).
+export const GUEST_COLUMN_ALIASES: Record<keyof CreateGuestInput, string[]> = {
+  fullName: ["nombre", "nombre completo", "invitado", "name", "full name"],
+  email: ["email", "correo", "e-mail"],
+  phone: ["telefono", "teléfono", "phone", "movil", "móvil"],
+  isVip: ["vip"],
+  isChild: ["nino", "niño", "es nino", "child", "menor"],
+  maxCompanions: ["acompanantes", "acompañantes", "companions", "plus ones", "invitados extra"],
+  groupName: ["grupo", "familia", "group", "family"],
+};
