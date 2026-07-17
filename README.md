@@ -14,17 +14,23 @@ Este repositorio contiene la **Fase 0 (fundación) + el arranque de la Fase 1 (M
 - ✅ Auth con Clerk (middleware, sign-in/sign-up, webhook de sincronización de usuarios)
 - ✅ Landing page completa (hero, características, plantillas, precios, contacto)
 - ✅ Dashboard con listado/creación de eventos
-- ✅ Wizard: pasos 1 (info básica) y 2 (tema) funcionales end-to-end; pasos 3–14 documentados
-  con el mismo patrón, listos para implementarse sin refactorizar nada
-- ✅ Invitación pública (`/i/[slug]`) con hero, cuenta atrás, historia y RSVP funcional
+- ✅ Wizard: pasos 1 (info básica), 2 (tema), 3 (paleta), 4 (tipografía con Google Fonts),
+  5 (activar/reordenar secciones), 12 (config. del formulario de RSVP), 13 (mensaje final) y
+  14 (vista previa + publicar) funcionales end-to-end. Pasos 6-11 (agenda, dress code,
+  regalos, hoteles, transporte, FAQ) pendientes — son editores de listas, se abordan en la
+  siguiente iteración con el mismo patrón ya establecido
+- ✅ Invitación pública (`/i/[slug]`) ya usa el tema (colores/tipografía) y las secciones
+  activas configuradas en el wizard, en vez de tener todo fijo en el código
+- ✅ Publicar/despublicar evento, y compartir (copiar enlace, WhatsApp, email) desde el
+  resumen del evento y desde el paso 14 del wizard
 - ✅ Gestión de invitados: alta manual, edición de estado RSVP, borrado, estadísticas
   (confirmados/pendientes/rechazados/asistentes totales)
 - ✅ Importación de invitados desde Excel/CSV: subida de archivo, auto-detección y mapeo
   manual de columnas, preview con validación fila a fila, import por lotes de hasta 500
 - ✅ Mesas: editor visual drag & drop (`@dnd-kit`) para asignar invitados a mesas, control
   de capacidad, colores, creación/borrado de mesas
-- ⏳ Pendiente (ver `docs/PLAN.md` → Fase 1 y Fase 2): resto de pasos del wizard, álbum,
-  regalos, notificaciones, analytics, editor visual de la invitación, PWA
+- ⏳ Pendiente (ver `docs/PLAN.md` → Fase 1 y Fase 2): wizard 6-11, álbum, regalos,
+  notificaciones, analytics, editor visual de la invitación, PWA
 
 ## Despliegue 100% desde el navegador (sin CLI ni instalación local)
 
@@ -86,36 +92,67 @@ subida vía navegador es de 100 archivos).
    - **Build command**: `npm run cf:build`
    - **Deploy command**: `npx wrangler deploy` (suele venir puesto por defecto)
    - **Root directory**: déjalo en blanco (el código está en la raíz del repo)
-4. En la sección de variables de esa misma pantalla, añade (marca las que apliquen tanto a
-   "build" como a "runtime" — Next.js necesita `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` en
-   ambos momentos):
+4. **Importante — esto es distinto de las variables de runtime**: Cloudflare tiene dos
+   secciones de variables separadas para un Worker conectado a Git. Ve a **Settings →
+   Builds → "Build variables and secrets"** (no la de "Variables and Secrets" a secas, esa
+   es solo para runtime) y añade ahí:
    - `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`
    - `CLERK_SECRET_KEY`
    - `NEXT_PUBLIC_CLERK_SIGN_IN_URL` = `/sign-in`
    - `NEXT_PUBLIC_CLERK_SIGN_UP_URL` = `/sign-up`
+
+   Next.js incrusta las variables `NEXT_PUBLIC_*` en el bundle durante `next build`, y
+   también necesita `CLERK_SECRET_KEY` en ese momento para poder pre-renderizar páginas
+   como `/_not-found`. Si estas variables solo existen en la sección de runtime, el build
+   falla con `Missing publishableKey` aunque en producción "debería" funcionar.
 5. **Save and Deploy**
 
 El binding `DB` (D1) no requiere configuración aparte aquí: Cloudflare lo lee directamente
 de `wrangler.toml`, que ya subiste con el ID correcto.
 
-Si necesitas añadir o editar variables más adelante: **tu Worker → Settings → Variables and
-Secrets** (variables de runtime) y **Settings → Builds** (variables específicas del paso de
-compilación) — ambas están en el dashboard, sin CLI.
+### Paso 8 — Añade las mismas claves también como variables de runtime
 
-### Paso 8 — Primer build
+Las "Build variables" del paso anterior solo existen durante la compilación — el Worker ya
+desplegado, al atender peticiones reales, lee sus variables de un sitio aparte. Ve a **tu
+Worker → Settings → Variables and Secrets** y añade (como *secret* las que son claves
+privadas):
 
-Cloudflare arrancará el build automáticamente tras el paso 7. Sigue el progreso en
-**tu Worker → Deployments**. Cuando termine, tendrás una URL tipo
+- `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`
+- `CLERK_SECRET_KEY` (como secret)
+- `NEXT_PUBLIC_CLERK_SIGN_IN_URL` = `/sign-in`
+- `NEXT_PUBLIC_CLERK_SIGN_UP_URL` = `/sign-up`
+
+Sin este paso, el build puede llegar a completarse pero cualquier ruta que llame a
+`auth()` (el dashboard, las rutas de API...) fallará en producción por falta de la clave.
+
+Si necesitas añadir o editar variables más adelante, son estas dos secciones — ambas están
+en el dashboard, sin CLI:
+- **Settings → Builds → "Build variables and secrets"** → variables del paso de compilación
+- **Settings → Variables and Secrets** → variables de runtime (el Worker ya desplegado)
+
+### Paso 9 — Primer build
+
+Cloudflare arrancará el build automáticamente en cuanto guardes la configuración del paso
+7 (no hace falta esperar al paso 8 para que arranque, pero si el build ya terminó antes de
+añadir las variables de runtime, no pasa nada — solo repite el deploy después). Sigue el
+progreso en **tu Worker → Deployments**. Cuando termine, tendrás una URL tipo
 `weddingflow.<tu-subdominio>.workers.dev`.
 
-### Paso 9 — Crea las tablas en D1 (sin CLI)
+### Paso 10 — Crea las tablas en D1 (sin CLI)
 
 1. **Storage & Databases → D1 → weddingflow-db → Console**
 2. Abre el archivo `drizzle/schema.sql` del repo (en GitHub, clic para verlo) y copia todo
    su contenido
 3. Pégalo en la consola de D1 y ejecútalo — crea las 20 tablas del esquema de un tirón
 
-### Paso 10 — Webhook de Clerk
+> Si tu base de datos ya existía de una iteración anterior del proyecto (por ejemplo, ya
+> habías ejecutado `schema.sql` antes de que se añadiera alguna columna nueva), no vuelvas
+> a ejecutar `schema.sql` entero — fallaría porque las tablas ya existen. En su lugar, mira
+> la carpeta `drizzle/migrations-manual/` del repo: cada archivo numerado es un cambio
+> incremental (por ejemplo, añadir una columna) que se pega y ejecuta igual en la consola
+> de D1, uno por uno, en orden.
+
+### Paso 11 — Webhook de Clerk
 
 1. Vuelve a Clerk → **Webhooks → Add Endpoint**
 2. URL: `https://<tu-worker>.workers.dev/api/webhooks/clerk`
@@ -123,7 +160,7 @@ Cloudflare arrancará el build automáticamente tras el paso 7. Sigue el progres
 4. Copia el **Signing Secret** → en Cloudflare, tu Worker → **Settings → Variables and
    Secrets → Add** → `CLERK_WEBHOOK_SECRET` (como *secret*, no texto plano)
 
-### Paso 11 — Prueba
+### Paso 12 — Prueba
 
 Abre tu URL `.workers.dev`, regístrate, crea un evento desde el wizard y comprueba que
 aparece en `/dashboard`. Cada vez que subas cambios a `main` en GitHub (arrastrando
