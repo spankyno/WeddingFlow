@@ -9,6 +9,6 @@ import * as schema from "@drizzle/schema";
  * handler/route en vez de crear un cliente global a nivel de módulo.
  */
 export function getDb() {
-  const { env } = getCloudflareContext<{ DB: D1Database }>();
+  const { env } = getCloudflareContext();
   return drizzle(env.DB, { schema });
 }

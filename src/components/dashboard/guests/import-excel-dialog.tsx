@@ -115,7 +115,10 @@ export function ImportExcelDialog({
     setFileName(file.name);
     const buffer = await file.arrayBuffer();
     const workbook = XLSX.read(buffer, { type: "array" });
-    const firstSheet = workbook.Sheets[workbook.SheetNames[0]!];
+    const firstSheetName = workbook.SheetNames[0];
+    const firstSheet = firstSheetName ? workbook.Sheets[firstSheetName] : undefined;
+    if (!firstSheet) return;
+
     const rows = XLSX.utils.sheet_to_json<RawRow>(firstSheet, { defval: "" });
 
     if (rows.length === 0) return;
