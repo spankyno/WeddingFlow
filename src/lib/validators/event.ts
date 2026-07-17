@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { eventTypeEnum, themePresetEnum } from "@drizzle/schema";
+import { eventTypeEnum, themePresetEnum, sectionKeyEnum, eventStatusEnum } from "@drizzle/schema";
 
 export const createEventSchema = z.object({
   eventType: z.enum(eventTypeEnum).default("wedding"),
@@ -31,6 +31,8 @@ export const updateThemeSchema = z.object({
   fontBody: z.string().min(1),
 });
 
+export type UpdateThemeInput = z.infer<typeof updateThemeSchema>;
+
 export const rsvpSubmitSchema = z.object({
   guestSlug: z.string().min(1),
   willAttend: z.boolean(),
@@ -40,3 +42,35 @@ export const rsvpSubmitSchema = z.object({
 });
 
 export type RsvpSubmitInput = z.infer<typeof rsvpSubmitSchema>;
+
+export const updateSectionsSchema = z.object({
+  sections: z
+    .array(
+      z.object({
+        sectionKey: z.enum(sectionKeyEnum),
+        isEnabled: z.boolean(),
+        sortOrder: z.number().int().min(0),
+      })
+    )
+    .min(1),
+});
+
+export type UpdateSectionsInput = z.infer<typeof updateSectionsSchema>;
+
+export const updateRsvpConfigSchema = z.object({
+  askPhone: z.boolean(),
+  askEmail: z.boolean(),
+  askCompanions: z.boolean(),
+  askDietary: z.boolean(),
+  askChildren: z.boolean(),
+  askMessage: z.boolean(),
+});
+
+export type UpdateRsvpConfigInput = z.infer<typeof updateRsvpConfigSchema>;
+
+export const updateEventDetailsSchema = z.object({
+  closingMessage: z.string().max(2000).optional().or(z.literal("")),
+  status: z.enum(eventStatusEnum).optional(),
+});
+
+export type UpdateEventDetailsInput = z.infer<typeof updateEventDetailsSchema>;
