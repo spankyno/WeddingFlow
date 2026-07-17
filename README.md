@@ -237,6 +237,16 @@ Domain. Una vez añadido, actualiza el webhook de Clerk del paso 3 con el domini
   crédito a la cuenta de Cloudflare aunque el uso caiga en capa gratuita. D1 solo guarda
   metadatos/URLs; cuando se aborde el álbum colaborativo (Fase 2) se integrará un proveedor
   externo sin tarjeta (Cloudinary, ImageKit...) — ver nota en `docs/PLAN.md`.
+- `cloudflare-env.d.ts` (generado con `wrangler types`) va **incluido en el repo** con los
+  tipos del binding `DB`. Si más adelante cambias algo en `wrangler.toml` (añades un
+  binding, por ejemplo), regenera este archivo con `npm run cf:typegen` y vuelve a subirlo
+  — si no, TypeScript no reconocerá el nuevo binding y el build fallará en el chequeo de
+  tipos.
+- `.npmrc` fuerza `legacy-peer-deps=true` como red de seguridad: Clerk v6 declara rangos de
+  peer dependencies muy estrictos con React/Next que a veces van por delante de las
+  versiones que fijamos en `package.json`; esto evita que un `npm install` falle por eso
+  (Cloudflare usa `bun install` por defecto, que ya es permisivo con esto, pero así queda
+  cubierto también si en algún momento cambia a npm).
 - Cada dominio (events, guests, tables...) tiene sus propias queries en
   `src/lib/db/queries/`, su propio validador Zod en `src/lib/validators/` y sus propios
   hooks en `src/hooks/`, siguiendo el patrón ya implementado para `events`. Añadir un nuevo
