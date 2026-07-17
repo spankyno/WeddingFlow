@@ -35,6 +35,7 @@ CREATE TABLE events (
   celebration_lat REAL,
   celebration_lng REAL,
   story_text TEXT,
+  closing_message TEXT,
   cover_image_url TEXT,
   status TEXT NOT NULL DEFAULT 'draft' CHECK (status IN ('draft','published','archived')),
   created_at TEXT NOT NULL DEFAULT (CURRENT_TIMESTAMP),

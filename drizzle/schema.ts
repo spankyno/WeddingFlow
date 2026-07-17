@@ -71,6 +71,7 @@ export const events = sqliteTable(
     celebrationLat: real("celebration_lat"),
     celebrationLng: real("celebration_lng"),
     storyText: text("story_text"),
+    closingMessage: text("closing_message"),
     coverImageUrl: text("cover_image_url"),
     status: text("status", { enum: eventStatusEnum }).notNull().default("draft"),
     ...timestamps,
