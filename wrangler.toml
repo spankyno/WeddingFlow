@@ -1,6 +1,6 @@
 name = "weddingflow"
 main = ".open-next/worker.js"
-compatibility_date = "2024-09-23"
+compatibility_date = "2025-06-01"
 compatibility_flags = ["nodejs_compat"]
 
 [assets]
@@ -9,12 +9,8 @@ binding = "ASSETS"
 
 [[d1_databases]]
 binding = "DB"
-database_name = "weddingflow"
-database_id = "9f8ea956-80ca-40c0-a22f-fb16c7a09208"
-
-[[r2_buckets]]
-binding = "MEDIA_BUCKET"
-bucket_name = "weddingflow-media"
+database_name = "weddingflow-db"
+database_id = "REPLACE_WITH_YOUR_D1_DATABASE_ID"
 
 # Cron trigger para recordatorios automáticos (Fase 2)
 [triggers]
