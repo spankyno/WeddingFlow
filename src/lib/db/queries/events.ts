@@ -1,7 +1,7 @@
 import { eq } from "drizzle-orm";
 import { getDb } from "@/lib/db/client";
-import { events, eventThemes, eventSections, sectionKeyEnum } from "@drizzle/schema";
-import type { CreateEventInput } from "@/lib/validators/event";
+import { events, eventThemes, eventSections, sectionKeyEnum, rsvpFormConfig } from "@drizzle/schema";
+import type { CreateEventInput, UpdateEventDetailsInput } from "@/lib/validators/event";
 import { nanoid } from "@/lib/utils";
 
 const DEFAULT_ENABLED_SECTIONS = [
@@ -85,7 +85,21 @@ export async function createEvent(userId: string, input: CreateEventInput) {
     }))
   );
 
+  await db.insert(rsvpFormConfig).values({ id: nanoid(), eventId: id });
+
   return { id, slug };
+}
+
+export async function updateEventDetails(eventId: string, input: UpdateEventDetailsInput) {
+  const db = getDb();
+  await db
+    .update(events)
+    .set({
+      ...(input.closingMessage !== undefined && { closingMessage: input.closingMessage || null }),
+      ...(input.status !== undefined && { status: input.status }),
+      updatedAt: new Date().toISOString(),
+    })
+    .where(eq(events.id, eventId));
 }
 
 export async function deleteEvent(eventId: string, userId: string) {
