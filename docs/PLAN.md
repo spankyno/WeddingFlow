@@ -7,7 +7,7 @@
 - **Animación**: Framer Motion
 - **Auth**: Clerk
 - **Base de datos**: Cloudflare D1 (SQLite) + Drizzle ORM (D1 no soporta Prisma de forma nativa/estable; Drizzle es el estándar recomendado por Cloudflare)
-- **Storage de archivos**: Cloudflare R2 (fotos, vídeos, PDFs generados) — D1 solo guarda metadatos/URLs, no binarios
+- **Storage de archivos**: pendiente de decidir (ver nota). D1 solo guarda metadatos/URLs, no binarios.
 - **Validación**: Zod + React Hook Form
 - **Data fetching / cache cliente**: TanStack Query
 - **Colas / tareas diferidas** (recordatorios, envío de emails): Cloudflare Queues + Cron Triggers
@@ -21,6 +21,15 @@
 > OpenNext las rutas corren en un runtime compatible con Node.js sobre Workers (flag
 > `nodejs_compat`), por lo que **ya no hace falta** forzar `export const runtime = 'edge'`
 > en cada ruta dinámica, a diferencia de lo que exigía next-on-pages.
+
+> Nota sobre almacenamiento de archivos: **R2 requiere añadir una tarjeta de crédito a la
+> cuenta de Cloudflare** (aunque su uso quede dentro de la capa gratuita), así que se ha
+> retirado del proyecto por ahora. Las fotos/vídeo/galería/álbum colaborativo del wizard
+> (Fase 2) necesitarán un proveedor de storage alternativo sin tarjeta — opciones típicas:
+> Cloudinary (gratis, sin tarjeta hasta cierto volumen), ImageKit, o Uploadthing. Cuando se
+> aborde esa fase, se define el proveedor y se implementa el binding/SDK correspondiente
+> sin tocar el resto del esquema (las columnas `url` en `event_media`, `album_photos`, etc.
+> son agnósticas al proveedor).
 
 ---
 
@@ -61,7 +70,8 @@ Objetivo: un usuario puede registrarse, crear **una** boda, personalizarla míni
 3. Agrupación de invitados: familias, parejas, niños, VIP
 4. Códigos QR únicos por invitado (generados on-the-fly, sin almacenar imagen — se guarda el payload y se renderiza)
 5. Gestión de mesas: editor visual drag & drop (dnd-kit), capacidad configurable, asignación de invitados
-6. Álbum colaborativo: subida de fotos por invitados a R2, moderación por los novios
+6. Álbum colaborativo: subida de fotos por invitados a un proveedor externo sin tarjeta
+   (Cloudinary/ImageKit — ver nota de storage más arriba), moderación por los novios
 7. Música: invitados sugieren canciones (búsqueda simple por texto, no integración Spotify en MVP de esta fase), novios aprueban/rechazan
 8. Notificaciones: email transaccional (confirmación recibida, recordatorio X días antes) vía Resend + Cron Trigger
 9. Exportar invitación a PDF (generación server-side con `@react-pdf/renderer`, compatible edge)
