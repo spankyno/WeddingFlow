@@ -3,8 +3,6 @@ import { NextResponse } from "next/server";
 import { getDb } from "@/lib/db/client";
 import { users } from "@drizzle/schema";
 
-export const runtime = "edge";
-
 // Configurar en el dashboard de Clerk: evento "user.created" → esta URL.
 // CLERK_WEBHOOK_SECRET debe estar definido como variable de entorno / secret de Pages.
 export async function POST(req: Request) {

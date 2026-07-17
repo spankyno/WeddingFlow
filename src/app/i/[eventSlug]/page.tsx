@@ -4,8 +4,6 @@ import { CountdownSection } from "@/components/invitation/sections/countdown";
 import { StorySection } from "@/components/invitation/sections/story";
 import { RsvpSection } from "@/components/invitation/sections/rsvp";
 
-export const runtime = "edge";
-
 // Nota: las demás secciones (gallery, video, map, agenda, dress_code, gifts,
 // hotels, transport, faq, music, album) siguen el mismo patrón — un componente
 // en components/invitation/sections/ que recibe `event` y se activa/oculta según
@@ -13,9 +11,10 @@ export const runtime = "edge";
 export default async function PublicInvitationPage({
   params,
 }: {
-  params: { eventSlug: string };
+  params: Promise<{ eventSlug: string }>;
 }) {
-  const event = await getEventBySlug(params.eventSlug);
+  const { eventSlug } = await params;
+  const event = await getEventBySlug(eventSlug);
   if (!event) notFound();
 
   return (

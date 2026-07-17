@@ -3,10 +3,8 @@ import { auth } from "@clerk/nextjs/server";
 import { createEventSchema } from "@/lib/validators/event";
 import { createEvent, listEventsForUser } from "@/lib/db/queries/events";
 
-export const runtime = "edge";
-
 export async function GET() {
-  const { userId } = auth();
+  const { userId } = await auth();
   if (!userId) return NextResponse.json({ error: "No autenticado" }, { status: 401 });
 
   const items = await listEventsForUser(userId);
@@ -14,7 +12,7 @@ export async function GET() {
 }
 
 export async function POST(req: Request) {
-  const { userId } = auth();
+  const { userId } = await auth();
   if (!userId) return NextResponse.json({ error: "No autenticado" }, { status: 401 });
 
   const body = await req.json();

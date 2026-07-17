@@ -5,8 +5,6 @@ import { guests, analyticsEvents } from "@drizzle/schema";
 import { rsvpSubmitSchema } from "@/lib/validators/event";
 import { nanoid } from "@/lib/utils";
 
-export const runtime = "edge";
-
 // Ruta pública: la usa el invitado sin sesión, identificado por su slug único (no adivinable).
 export async function POST(req: Request) {
   const body = await req.json();
