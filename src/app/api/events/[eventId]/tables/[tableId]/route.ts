@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
-import { assertEventOwnership } from "@/lib/db/queries/events";
+import { assertEventAccess } from "@/lib/db/queries/events";
 import { updateTable, deleteTable, getTableById } from "@/lib/db/queries/tables";
 import { unassignGuestsFromTable } from "@/lib/db/queries/guests";
 import { updateTableSchema } from "@/lib/validators/table";
@@ -8,7 +8,7 @@ import { updateTableSchema } from "@/lib/validators/table";
 type RouteParams = { params: Promise<{ eventId: string; tableId: string }> };
 
 async function assertTableBelongsToOwnedEvent(eventId: string, tableId: string, userId: string) {
-  const event = await assertEventOwnership(eventId, userId);
+  const event = await assertEventAccess(eventId, userId);
   if (!event) return null;
   const table = await getTableById(tableId);
   if (!table || table.eventId !== eventId) return null;

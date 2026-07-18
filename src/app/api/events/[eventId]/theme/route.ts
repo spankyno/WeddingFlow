@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
-import { assertEventOwnership } from "@/lib/db/queries/events";
+import { assertEventAccess } from "@/lib/db/queries/events";
 import { getThemeForEvent, updateTheme } from "@/lib/db/queries/event-config";
 import { updateThemeSchema } from "@/lib/validators/event";
 
@@ -11,7 +11,7 @@ export async function GET(req: Request, { params }: RouteParams) {
   if (!userId) return NextResponse.json({ error: "No autenticado" }, { status: 401 });
 
   const { eventId } = await params;
-  const event = await assertEventOwnership(eventId, userId);
+  const event = await assertEventAccess(eventId, userId);
   if (!event) return NextResponse.json({ error: "Evento no encontrado" }, { status: 404 });
 
   const theme = await getThemeForEvent(eventId);
@@ -23,7 +23,7 @@ export async function PATCH(req: Request, { params }: RouteParams) {
   if (!userId) return NextResponse.json({ error: "No autenticado" }, { status: 401 });
 
   const { eventId } = await params;
-  const event = await assertEventOwnership(eventId, userId);
+  const event = await assertEventAccess(eventId, userId);
   if (!event) return NextResponse.json({ error: "Evento no encontrado" }, { status: 404 });
 
   const body = await req.json();

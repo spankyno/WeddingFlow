@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { assertEventAccess } from "@/lib/db/queries/events";
-import { createGuest, listGuestsForEvent, getGuestStats } from "@/lib/db/queries/guests";
-import { createGuestSchema } from "@/lib/validators/guest";
+import { listTransportOptions, createTransportOption } from "@/lib/db/queries/wizard-extras";
+import { createTransportOptionSchema } from "@/lib/validators/wizard-extras";
 
 type RouteParams = { params: Promise<{ eventId: string }> };
 
@@ -14,12 +14,8 @@ export async function GET(req: Request, { params }: RouteParams) {
   const event = await assertEventAccess(eventId, userId);
   if (!event) return NextResponse.json({ error: "Evento no encontrado" }, { status: 404 });
 
-  const [items, stats] = await Promise.all([
-    listGuestsForEvent(eventId),
-    getGuestStats(eventId),
-  ]);
-
-  return NextResponse.json({ items, stats });
+  const items = await listTransportOptions(eventId);
+  return NextResponse.json({ items });
 }
 
 export async function POST(req: Request, { params }: RouteParams) {
@@ -31,11 +27,11 @@ export async function POST(req: Request, { params }: RouteParams) {
   if (!event) return NextResponse.json({ error: "Evento no encontrado" }, { status: 404 });
 
   const body = await req.json();
-  const parsed = createGuestSchema.safeParse(body);
+  const parsed = createTransportOptionSchema.safeParse(body);
   if (!parsed.success) {
     return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
   }
 
-  const result = await createGuest(eventId, parsed.data);
+  const result = await createTransportOption(eventId, parsed.data);
   return NextResponse.json(result, { status: 201 });
 }

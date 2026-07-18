@@ -2,6 +2,7 @@ import { Webhook } from "svix";
 import { NextResponse } from "next/server";
 import { getDb } from "@/lib/db/client";
 import { users } from "@drizzle/schema";
+import { linkPendingCollaboratorInvites } from "@/lib/db/queries/collaborators";
 
 // Configurar en el dashboard de Clerk: evento "user.created" → esta URL.
 // CLERK_WEBHOOK_SECRET debe estar definido como variable de entorno / secret de Pages.
@@ -28,12 +29,18 @@ export async function POST(req: Request) {
   if (event.type === "user.created") {
     const db = getDb();
     const { id, email_addresses, first_name, last_name, image_url } = event.data;
+    const email = email_addresses?.[0]?.email_address ?? "";
+
     await db.insert(users).values({
       id,
-      email: email_addresses?.[0]?.email_address ?? "",
+      email,
       fullName: [first_name, last_name].filter(Boolean).join(" "),
       avatarUrl: image_url,
     });
+
+    if (email) {
+      await linkPendingCollaboratorInvites(id, email);
+    }
   }
 
   return NextResponse.json({ ok: true });
