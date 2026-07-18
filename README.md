@@ -1,6 +1,6 @@
 # WeddingFlow
 
-Invitaciones digitales de boda (y comuniones, bautizos, cumpleaños, eventos corporativos)
+Invitaciones digitales de boda (y comuniones, bautizos, cumpleaños, eventos corporativos) 
 en un mismo motor. Next.js 15 + Cloudflare Workers (OpenNext) + D1 + Clerk.
 
 Ver el plan de desarrollo completo, esquema de base de datos y arquitectura en
