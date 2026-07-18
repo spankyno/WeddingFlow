@@ -1,0 +1,36 @@
+import { notFound } from "next/navigation";
+import { getEventBySlug } from "@/lib/db/queries/events";
+import { getGuestBySlug } from "@/lib/db/queries/guests";
+import { getTableById } from "@/lib/db/queries/tables";
+import { loadInvitationContent } from "@/lib/db/queries/invitation-content";
+import { InvitationView } from "@/components/invitation/invitation-view";
+
+export default async function PersonalizedInvitationPage({
+  params,
+}: {
+  params: Promise<{ eventSlug: string; guestSlug: string }>;
+}) {
+  const { eventSlug, guestSlug } = await params;
+  const event = await getEventBySlug(eventSlug);
+  if (!event) notFound();
+
+  const guest = await getGuestBySlug(guestSlug);
+  if (!guest || guest.eventId !== event.id) notFound();
+
+  const [content, table] = await Promise.all([
+    loadInvitationContent(event.id),
+    guest.tableId ? getTableById(guest.tableId) : Promise.resolve(null),
+  ]);
+
+  return (
+    <InvitationView
+      event={event}
+      content={content}
+      guest={{
+        fullName: guest.fullName,
+        uniqueSlug: guest.uniqueSlug,
+        tableName: table?.name ?? null,
+      }}
+    />
+  );
+}
