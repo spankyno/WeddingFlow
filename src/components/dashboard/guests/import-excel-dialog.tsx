@@ -4,13 +4,13 @@ import { useMemo, useState } from "react";
 import * as XLSX from "xlsx";
 import { Dialog } from "@/components/ui/dialog";
 import {
-  createGuestSchema,
+  importGuestRowSchema,
   GUEST_COLUMN_ALIASES,
-  type CreateGuestInput,
+  type ImportGuestRowInput,
 } from "@/lib/validators/guest";
 import { useImportGuests } from "@/hooks/use-guests";
 
-type TargetField = keyof CreateGuestInput;
+type TargetField = keyof ImportGuestRowInput;
 type RawRow = Record<string, unknown>;
 
 const FIELD_LABELS: Record<TargetField, string> = {
@@ -21,6 +21,7 @@ const FIELD_LABELS: Record<TargetField, string> = {
   isChild: "Es un niño",
   maxCompanions: "Acompañantes",
   groupName: "Grupo / familia",
+  tableName: "Mesa asignada",
 };
 
 const TRUTHY_VALUES = new Set(["si", "sí", "true", "1", "x", "yes", "vip"]);
@@ -42,6 +43,7 @@ function autoDetectMapping(headers: string[]): Record<TargetField, string | null
     isChild: null,
     maxCompanions: null,
     groupName: null,
+    tableName: null,
   };
   for (const field of Object.keys(GUEST_COLUMN_ALIASES) as TargetField[]) {
     const aliases = GUEST_COLUMN_ALIASES[field];
@@ -57,7 +59,7 @@ function toBoolean(value: unknown) {
   return TRUTHY_VALUES.has(String(value).toLowerCase().trim());
 }
 
-function normalizeRow(row: RawRow, mapping: Record<TargetField, string | null>): CreateGuestInput {
+function normalizeRow(row: RawRow, mapping: Record<TargetField, string | null>): ImportGuestRowInput {
   return {
     fullName: mapping.fullName ? String(row[mapping.fullName] ?? "").trim() : "",
     email: mapping.email ? String(row[mapping.email] ?? "").trim() : "",
@@ -66,6 +68,7 @@ function normalizeRow(row: RawRow, mapping: Record<TargetField, string | null>):
     isChild: mapping.isChild ? toBoolean(row[mapping.isChild]) : false,
     maxCompanions: mapping.maxCompanions ? Number(row[mapping.maxCompanions] ?? 0) || 0 : 0,
     groupName: mapping.groupName ? String(row[mapping.groupName] ?? "").trim() : "",
+    tableName: mapping.tableName ? String(row[mapping.tableName] ?? "").trim() : "",
   };
 }
 
@@ -86,12 +89,12 @@ export function ImportExcelDialog({
   const [importedCount, setImportedCount] = useState<number | null>(null);
 
   const { validRows, invalidCount } = useMemo(() => {
-    if (!rawRows || !mapping) return { validRows: [] as CreateGuestInput[], invalidCount: 0 };
+    if (!rawRows || !mapping) return { validRows: [] as ImportGuestRowInput[], invalidCount: 0 };
     let invalid = 0;
-    const valid: CreateGuestInput[] = [];
+    const valid: ImportGuestRowInput[] = [];
     for (const row of rawRows) {
       const normalized = normalizeRow(row, mapping);
-      const parsed = createGuestSchema.safeParse(normalized);
+      const parsed = importGuestRowSchema.safeParse(normalized);
       if (parsed.success) valid.push(parsed.data);
       else invalid++;
     }
@@ -140,6 +143,15 @@ export function ImportExcelDialog({
     setImportedCount(total);
   }
 
+  function handleDownloadTemplate() {
+    const headers = ["Nombre", "Email", "Teléfono", "Acompañantes", "VIP", "Niño", "Grupo", "Mesa"];
+    const example = ["Ana García", "ana@example.com", "600123456", 2, "", "", "Familia García", "Mesa 3"];
+    const worksheet = XLSX.utils.aoa_to_sheet([headers, example]);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Invitados");
+    XLSX.writeFile(workbook, "plantilla-invitados-weddingflow.xlsx");
+  }
+
   return (
     <Dialog open={open} onClose={handleClose} title="Importar invitados desde Excel" maxWidthClassName="max-w-3xl">
       {importedCount !== null ? (
@@ -166,9 +178,15 @@ export function ImportExcelDialog({
             />
           </label>
           <p className="mt-4 text-xs text-ink/40">
-            Consejo: incluye columnas como "Nombre", "Email", "Teléfono", "Acompañantes" y
-            "Grupo" — se detectan automáticamente.
+            Consejo: incluye columnas como "Nombre", "Email", "Teléfono", "Acompañantes",
+            "Grupo" y "Mesa" — se detectan automáticamente.
           </p>
+          <button
+            onClick={handleDownloadTemplate}
+            className="mt-4 text-xs text-gold-dark underline underline-offset-4"
+          >
+            Descargar plantilla de ejemplo
+          </button>
         </div>
       ) : (
         <div>
