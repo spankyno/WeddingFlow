@@ -3,6 +3,7 @@ import { getDb } from "@/lib/db/client";
 import { eventThemes, eventSections, rsvpFormConfig } from "@drizzle/schema";
 import type { UpdateThemeInput } from "@/lib/validators/event";
 import type { UpdateSectionsInput, UpdateRsvpConfigInput } from "@/lib/validators/event";
+import { nanoid } from "@/lib/utils";
 
 /* -------------------------------------- Tema -------------------------------------- */
 // event_themes se crea siempre junto con el evento (ver createEvent), así que aquí solo
@@ -67,15 +68,20 @@ export async function getRsvpConfigForEvent(eventId: string) {
 
 export async function updateRsvpConfig(eventId: string, input: UpdateRsvpConfigInput) {
   const db = getDb();
-  await db
-    .update(rsvpFormConfig)
-    .set({
-      askPhone: input.askPhone,
-      askEmail: input.askEmail,
-      askCompanions: input.askCompanions,
-      askDietary: input.askDietary,
-      askChildren: input.askChildren,
-      askMessage: input.askMessage,
-    })
-    .where(eq(rsvpFormConfig.eventId, eventId));
+  const existing = await getRsvpConfigForEvent(eventId);
+
+  const values = {
+    askPhone: input.askPhone,
+    askEmail: input.askEmail,
+    askCompanions: input.askCompanions,
+    askDietary: input.askDietary,
+    askChildren: input.askChildren,
+    askMessage: input.askMessage,
+  };
+
+  if (existing) {
+    await db.update(rsvpFormConfig).set(values).where(eq(rsvpFormConfig.eventId, eventId));
+  } else {
+    await db.insert(rsvpFormConfig).values({ id: nanoid(), eventId, ...values });
+  }
 }

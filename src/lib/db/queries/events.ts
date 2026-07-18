@@ -1,6 +1,6 @@
-import { eq } from "drizzle-orm";
+import { eq, and, isNotNull } from "drizzle-orm";
 import { getDb } from "@/lib/db/client";
-import { events, eventThemes, eventSections, sectionKeyEnum, rsvpFormConfig } from "@drizzle/schema";
+import { events, eventThemes, eventSections, sectionKeyEnum, rsvpFormConfig, dressCode, collaborators } from "@drizzle/schema";
 import type { CreateEventInput, UpdateEventDetailsInput } from "@/lib/validators/event";
 import { nanoid } from "@/lib/utils";
 
@@ -87,6 +87,8 @@ export async function createEvent(userId: string, input: CreateEventInput) {
 
   await db.insert(rsvpFormConfig).values({ id: nanoid(), eventId: id });
 
+  await db.insert(dressCode).values({ id: nanoid(), eventId: id });
+
   return { id, slug };
 }
 
@@ -117,4 +119,32 @@ export async function assertEventOwnership(eventId: string, userId: string) {
   const event = await getEventById(eventId);
   if (!event || event.ownerUserId !== userId) return null;
   return event;
+}
+
+/**
+ * Como assertEventOwnership, pero además permite el acceso a colaboradores ya aceptados
+ * del evento (cualquier rol). Se usa en los sub-recursos de contenido (invitados, mesas,
+ * wizard, álbum...) para que un colaborador pueda ayudar a gestionar el evento. La gestión
+ * de la propia lista de colaboradores y el borrado del evento siguen siendo solo del dueño
+ * (ver assertEventOwnership).
+ */
+export async function assertEventAccess(eventId: string, userId: string) {
+  const event = await getEventById(eventId);
+  if (!event) return null;
+  if (event.ownerUserId === userId) return event;
+
+  const db = getDb();
+  const collaborator = await db
+    .select()
+    .from(collaborators)
+    .where(
+      and(
+        eq(collaborators.eventId, eventId),
+        eq(collaborators.userId, userId),
+        isNotNull(collaborators.acceptedAt)
+      )
+    )
+    .get();
+
+  return collaborator ? event : null;
 }

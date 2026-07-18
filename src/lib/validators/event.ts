@@ -39,6 +39,8 @@ export const rsvpSubmitSchema = z.object({
   companionsCount: z.number().int().min(0).max(20).default(0),
   dietaryRestrictions: z.string().max(500).optional(),
   message: z.string().max(1000).optional(),
+  email: z.string().email("Email inválido").optional().or(z.literal("")),
+  phone: z.string().max(30).optional().or(z.literal("")),
 });
 
 export type RsvpSubmitInput = z.infer<typeof rsvpSubmitSchema>;

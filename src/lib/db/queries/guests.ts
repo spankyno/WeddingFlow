@@ -1,7 +1,7 @@
 import { eq, and } from "drizzle-orm";
 import { getDb } from "@/lib/db/client";
-import { guests, guestGroups } from "@drizzle/schema";
-import type { CreateGuestInput, UpdateGuestInput } from "@/lib/validators/guest";
+import { guests, guestGroups, tables } from "@drizzle/schema";
+import type { CreateGuestInput, UpdateGuestInput, ImportGuestRowInput } from "@/lib/validators/guest";
 import { nanoid } from "@/lib/utils";
 
 function slugifyGuest(fullName: string) {
@@ -50,6 +50,21 @@ async function findOrCreateGuestGroup(eventId: string, name: string) {
   return id;
 }
 
+/** Busca una mesa por nombre dentro del evento, o la crea (capacidad por defecto 8) si no existe. */
+async function findOrCreateTable(eventId: string, name: string) {
+  const db = getDb();
+  const existing = await db
+    .select()
+    .from(tables)
+    .where(and(eq(tables.eventId, eventId), eq(tables.name, name)))
+    .get();
+  if (existing) return existing.id;
+
+  const id = nanoid();
+  await db.insert(tables).values({ id, eventId, name, capacity: 8 });
+  return id;
+}
+
 export async function createGuest(eventId: string, input: CreateGuestInput) {
   const db = getDb();
   const id = nanoid();
@@ -73,10 +88,11 @@ export async function createGuest(eventId: string, input: CreateGuestInput) {
 }
 
 /**
- * Alta masiva (importación Excel/CSV). Resuelve primero los grupos únicos presentes en el
- * lote para no golpear la base de datos una vez por fila, y hace una única inserción masiva.
+ * Alta masiva (importación Excel/CSV). Resuelve primero los grupos y mesas únicos
+ * presentes en el lote para no golpear la base de datos una vez por fila, y hace una
+ * única inserción masiva de invitados.
  */
-export async function bulkCreateGuests(eventId: string, inputs: CreateGuestInput[]) {
+export async function bulkCreateGuests(eventId: string, inputs: ImportGuestRowInput[]) {
   const db = getDb();
 
   const uniqueGroupNames = [...new Set(inputs.map((g) => g.groupName).filter(Boolean))] as string[];
@@ -85,10 +101,17 @@ export async function bulkCreateGuests(eventId: string, inputs: CreateGuestInput
     groupIdByName.set(name, await findOrCreateGuestGroup(eventId, name));
   }
 
+  const uniqueTableNames = [...new Set(inputs.map((g) => g.tableName).filter(Boolean))] as string[];
+  const tableIdByName = new Map<string, string>();
+  for (const name of uniqueTableNames) {
+    tableIdByName.set(name, await findOrCreateTable(eventId, name));
+  }
+
   const rows = inputs.map((input) => ({
     id: nanoid(),
     eventId,
     guestGroupId: input.groupName ? groupIdByName.get(input.groupName) ?? null : null,
+    tableId: input.tableName ? tableIdByName.get(input.tableName) ?? null : null,
     fullName: input.fullName,
     email: input.email || null,
     phone: input.phone || null,
@@ -134,4 +157,33 @@ export async function getGuestById(guestId: string) {
 export async function unassignGuestsFromTable(tableId: string) {
   const db = getDb();
   await db.update(guests).set({ tableId: null }).where(eq(guests.tableId, tableId));
+}
+
+/** Invitación personalizada: busca al invitado por su slug único (URL no adivinable). */
+export async function getGuestBySlug(guestSlug: string) {
+  const db = getDb();
+  return db.select().from(guests).where(eq(guests.uniqueSlug, guestSlug)).get();
+}
+
+/**
+ * Búsqueda pública por nombre desde la invitación general ("busca tu invitación").
+ * Coincidencia parcial, insensible a mayúsculas/acentos, limitada a 5 resultados para no
+ * filtrar el listado completo de invitados ante una query vacía o muy corta.
+ */
+export async function findGuestsByName(eventId: string, fullName: string) {
+  const db = getDb();
+  const all = await listGuestsForEvent(eventId);
+  const normalize = (s: string) =>
+    s
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .trim();
+  const query = normalize(fullName);
+  if (query.length < 2) return [];
+
+  return all
+    .filter((g) => normalize(g.fullName).includes(query))
+    .slice(0, 5)
+    .map((g) => ({ guestSlug: g.uniqueSlug, fullName: g.fullName }));
 }
