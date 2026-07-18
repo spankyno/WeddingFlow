@@ -5,10 +5,12 @@ import { ShareButtons } from "@/components/dashboard/share-buttons";
 
 const SECTIONS = [
   { href: "wizard/1", label: "Editar invitación", desc: "Retoma el wizard en cualquier paso" },
-  { href: "invitados", label: "Invitados", desc: "Alta manual, import Excel, confirmaciones" },
+  { href: "invitados", label: "Invitados", desc: "Alta manual, import Excel, QR, confirmaciones" },
   { href: "mesas", label: "Mesas", desc: "Editor visual drag & drop de distribución" },
-  { href: "album", label: "Álbum", desc: "Fotos colaborativas (próximamente)" },
-  { href: "regalos", label: "Lista de regalos", desc: "IBAN, Bizum, PayPal, Amazon (próximamente)" },
+  { href: "musica", label: "Música", desc: "Aprobar o rechazar canciones sugeridas" },
+  { href: "album", label: "Álbum", desc: "Moderar fotos subidas por los invitados" },
+  { href: "colaboradores", label: "Colaboradores", desc: "Invita a otras personas a ayudarte" },
+  { href: "regalos", label: "Lista de regalos", desc: "Se configura desde el wizard, paso 8" },
   { href: "analytics", label: "Analytics", desc: "Visitas y confirmaciones (próximamente)" },
 ];
 
