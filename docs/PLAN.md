@@ -65,23 +65,22 @@ Objetivo: un usuario puede registrarse, crear **una** boda, personalizarla míni
 
 ## Fase 2 — Versión 1.0 (paridad con el spec funcional)
 
-1. Wizard completo (14 pasos): paleta y tipografía con selector de Google Fonts, agenda multi-evento, dress code, lista de regalos (IBAN/Bizum/PayPal/Amazon), hoteles, transporte, FAQ dinámico
-2. Importación de invitados desde Excel/CSV (parseo en cliente, validación con Zod, preview antes de confirmar)
-3. Agrupación de invitados: familias, parejas, niños, VIP
-4. Códigos QR únicos por invitado (generados on-the-fly, sin almacenar imagen — se guarda el payload y se renderiza)
-5. Gestión de mesas: editor visual drag & drop (dnd-kit), capacidad configurable, asignación de invitados
-6. Álbum colaborativo: subida de fotos por invitados a un proveedor externo sin tarjeta
-   (Cloudinary/ImageKit — ver nota de storage más arriba), moderación por los novios
-7. Música: invitados sugieren canciones (búsqueda simple por texto, no integración Spotify en MVP de esta fase), novios aprueban/rechazan
-8. Notificaciones: email transaccional (confirmación recibida, recordatorio X días antes) vía Resend + Cron Trigger
+1. ✅ Wizard completo (14 pasos): paleta y tipografía con selector de Google Fonts, agenda multi-evento, dress code, lista de regalos (IBAN/Bizum/PayPal/Amazon), hoteles, transporte, FAQ dinámico
+2. ✅ Importación de invitados desde Excel/CSV (parseo en cliente, validación con Zod, preview antes de confirmar) — incluye asignación de mesa por nombre y plantilla descargable
+3. ✅ Agrupación de invitados: familias, parejas, niños, VIP
+4. ✅ Códigos QR únicos por invitado (generados on-the-fly en el cliente con la librería `qrcode`, sin almacenar imagen — apuntan a la invitación personalizada `/i/[slug]/[guestSlug]`)
+5. ✅ Gestión de mesas: editor visual drag & drop (dnd-kit), capacidad configurable, asignación de invitados
+6. ✅ Álbum colaborativo: subida de fotos por invitados a Cloudinary (unsigned upload, sin tarjeta), moderación por los novios
+7. ✅ Música: invitados sugieren canciones (texto libre título+artista), novios aprueban/rechazan
+8. 🟡 Notificaciones: email transaccional (confirmación recibida + confirmación al invitado) vía Resend implementado. **Pendiente**: recordatorios programados X días antes — necesitan un cron handler dedicado en el Worker (OpenNext no lo expone por defecto), se aborda aparte
 9. Exportar invitación a PDF (generación server-side con `@react-pdf/renderer`, compatible edge)
-10. Descargar invitación como imagen (captura server-side con un servicio ligero tipo `satori` + `resvg`, compatible edge — evita Puppeteer, que no corre en Cloudflare Pages)
+10. Descargar invitación como imagen (captura server-side con un servicio ligero tipo `satori` + `resvg`, compatible edge — evita Puppeteer, que no corre en Cloudflare Workers)
 11. Añadir al calendario (ICS genérico que sirve para Apple/Google/Outlook, sin integraciones OAuth)
-12. Analytics básico: visitas, confirmaciones, dispositivo (user-agent), sin librería de terceros — tabla propia `analytics_event`
-13. Roles: administrador (dueño), colaborador (edición limitada) — invitación por email
-14. Editor visual tipo Canva simplificado: reordenar secciones (drag & drop de bloques ya definidos) + editar colores/tipografía por bloque. **No** es un editor de layout libre tipo Canva real (eso es Fase 3, altísimo coste); en 1.0 es "reordenar y personalizar bloques predefinidos"
+12. Analytics básico: visitas, confirmaciones, dispositivo (user-agent), sin librería de terceros — tabla propia `analytics_event` (la tabla y el registro de eventos `rsvp_submit` ya existen; falta el panel de visualización)
+13. ✅ Roles: administrador/dueño con control total, colaboradores (cualquier rol) con acceso de edición a invitados/mesas/wizard/contenido — invitación por email con vinculación automática al crear cuenta. Pendiente para más adelante: permisos más granulares por rol específico (hoy todos los roles de colaborador tienen el mismo nivel de acceso)
+14. Editor visual tipo Canva simplificado: reordenar secciones (drag & drop de bloques ya definidos) + editar colores/tipografía por bloque. **No** es un editor de layout libre tipo Canva real (eso es Fase 3, altísimo coste); en 1.0 es "reordenar y personalizar bloques predefinidos". Nota: el paso 5 del wizard ya permite reordenar/activar secciones — falta el editor de colores/tipografía *por bloque* (hoy es global para toda la invitación)
 15. PWA: manifest + service worker básico (cache de assets estáticos, no offline-first completo)
-16. Motor multi-evento: abstraer `wedding` a `event` con `event_type` (boda, comunión, bautizo, cumpleaños, corporativo) reutilizando el mismo modelo de datos
+16. ✅ Motor multi-evento: `events.event_type` (boda, comunión, bautizo, cumpleaños, corporativo) ya reutiliza el mismo modelo de datos desde el principio
 
 **Entregable**: producto con paridad funcional completa frente al spec, listo para primeros usuarios reales.
 

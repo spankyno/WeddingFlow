@@ -1,6 +1,6 @@
 # WeddingFlow
 
-Invitaciones digitales de boda (y comuniones, bautizos, cumpleaños, eventos corporativos) 
+Invitaciones digitales de boda (y comuniones, bautizos, cumpleaños, eventos corporativos)
 en un mismo motor. Next.js 15 + Cloudflare Workers (OpenNext) + D1 + Clerk.
 
 Ver el plan de desarrollo completo, esquema de base de datos y arquitectura en
@@ -14,13 +14,14 @@ Este repositorio contiene la **Fase 0 (fundación) + el arranque de la Fase 1 (M
 - ✅ Auth con Clerk (middleware, sign-in/sign-up, webhook de sincronización de usuarios)
 - ✅ Landing page completa (hero, características, plantillas, precios, contacto)
 - ✅ Dashboard con listado/creación de eventos
-- ✅ Wizard: pasos 1 (info básica), 2 (tema), 3 (paleta), 4 (tipografía con Google Fonts),
-  5 (activar/reordenar secciones), 12 (config. del formulario de RSVP), 13 (mensaje final) y
-  14 (vista previa + publicar) funcionales end-to-end. Pasos 6-11 (agenda, dress code,
-  regalos, hoteles, transporte, FAQ) pendientes — son editores de listas, se abordan en la
-  siguiente iteración con el mismo patrón ya establecido
-- ✅ Invitación pública (`/i/[slug]`) ya usa el tema (colores/tipografía) y las secciones
-  activas configuradas en el wizard, en vez de tener todo fijo en el código
+- ✅ **Wizard completo, los 14 pasos**: info básica, tema, paleta, tipografía, secciones,
+  agenda, dress code, lista de regalos, hoteles, transporte, FAQ, config. del formulario de
+  RSVP, mensaje final y vista previa + publicación. Todos funcionales end-to-end.
+- ✅ Invitación pública (`/i/[slug]`) ya usa el tema (colores/tipografía) y renderiza todas
+  las secciones configurables del wizard en el orden y activación elegidos: hero, cuenta
+  atrás, historia, agenda, dress code, hoteles, transporte, regalos, RSVP, FAQ y mensaje
+  final. Pendientes de componente visual: galería, vídeo, mapa, música y álbum — necesitan
+  un proveedor de storage (ver nota de R2 más abajo)
 - ✅ Publicar/despublicar evento, y compartir (copiar enlace, WhatsApp, email) desde el
   resumen del evento y desde el paso 14 del wizard
 - ✅ Gestión de invitados: alta manual, edición de estado RSVP, borrado, estadísticas
@@ -29,8 +30,26 @@ Este repositorio contiene la **Fase 0 (fundación) + el arranque de la Fase 1 (M
   manual de columnas, preview con validación fila a fila, import por lotes de hasta 500
 - ✅ Mesas: editor visual drag & drop (`@dnd-kit`) para asignar invitados a mesas, control
   de capacidad, colores, creación/borrado de mesas
-- ⏳ Pendiente (ver `docs/PLAN.md` → Fase 1 y Fase 2): wizard 6-11, álbum, regalos,
-  notificaciones, analytics, editor visual de la invitación, PWA
+- ✅ **Invitación personalizada por invitado** (`/i/[slug]/[guestSlug]`): saludo con su
+  nombre, mesa asignada, y el formulario de RSVP real (antes solo existía la invitación
+  general, que ahora usa un buscador por nombre para redirigir a la personalizada — se
+  arregló un bug por el que el RSVP general nunca guardaba nada)
+- ✅ Código QR por invitado + diálogo de invitar (enlace, WhatsApp, email, descargar QR)
+  desde la tabla de invitados
+- ✅ Import de Excel avanzado: asignación de mesa por nombre (se crea si no existe) y
+  plantilla de ejemplo descargable
+- ✅ Música: los invitados sugieren canciones desde la invitación, los novios las
+  aprueban/rechazan desde el dashboard
+- ✅ Álbum colaborativo: subida de fotos vía Cloudinary (unsigned upload, sin servidor
+  propio), moderación desde el dashboard — **requiere configurar Cloudinary**, ver más abajo
+- ✅ Notificaciones por email (Resend): al organizador cuando alguien confirma/rechaza, y
+  confirmación al propio invitado — **requiere configurar Resend**, ver más abajo
+- ✅ Roles y colaboradores: invitar por email, vinculación automática al crear cuenta,
+  acceso de edición a todo el contenido del evento (invitados, mesas, wizard...); solo el
+  propietario gestiona la lista de colaboradores
+- ⏳ Pendiente (ver `docs/PLAN.md` → Fase 2): analytics, editor visual de la invitación
+  (reordenar bloques tipo Canva), PWA, recordatorios automáticos programados (necesitan un
+  cron handler dedicado en el Worker, más allá del alcance de OpenNext por defecto)
 
 ## Despliegue 100% desde el navegador (sin CLI ni instalación local)
 
@@ -100,6 +119,11 @@ subida vía navegador es de 100 archivos).
    - `CLERK_SECRET_KEY`
    - `NEXT_PUBLIC_CLERK_SIGN_IN_URL` = `/sign-in`
    - `NEXT_PUBLIC_CLERK_SIGN_UP_URL` = `/sign-up`
+   - `NEXT_PUBLIC_CLERK_SIGN_IN_FALLBACK_REDIRECT_URL` = `/dashboard`
+   - `NEXT_PUBLIC_CLERK_SIGN_UP_FALLBACK_REDIRECT_URL` = `/dashboard`
+   - Si ya tienes tus claves de Cloudinary (álbum) a mano, añádelas también aquí — si no,
+     puedes volver a este paso más adelante. Ver **"Configurar el álbum colaborativo"** más
+     abajo. `RESEND_API_KEY` no hace falta aquí (solo en el paso 8, es de runtime).
 
    Next.js incrusta las variables `NEXT_PUBLIC_*` en el bundle durante `next build`, y
    también necesita `CLERK_SECRET_KEY` en ese momento para poder pre-renderizar páginas
@@ -121,6 +145,10 @@ privadas):
 - `CLERK_SECRET_KEY` (como secret)
 - `NEXT_PUBLIC_CLERK_SIGN_IN_URL` = `/sign-in`
 - `NEXT_PUBLIC_CLERK_SIGN_UP_URL` = `/sign-up`
+- `NEXT_PUBLIC_CLERK_SIGN_IN_FALLBACK_REDIRECT_URL` = `/dashboard`
+- `NEXT_PUBLIC_CLERK_SIGN_UP_FALLBACK_REDIRECT_URL` = `/dashboard`
+- `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME` y `NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET` (álbum)
+- `RESEND_API_KEY` como secret (notificaciones por email)
 
 Sin este paso, el build puede llegar a completarse pero cualquier ruta que llame a
 `auth()` (el dashboard, las rutas de API...) fallará en producción por falta de la clave.
@@ -260,6 +288,39 @@ El binding `DB` (D1) ya queda conectado automáticamente porque está declarado 
 
 En el dashboard: Workers & Pages → weddingflow → Settings → Domains & Routes → Add Custom
 Domain. Una vez añadido, actualiza el webhook de Clerk del paso 3 con el dominio definitivo.
+
+## Configurar el álbum colaborativo (Cloudinary)
+
+1. Crea una cuenta gratuita en https://cloudinary.com (no pide tarjeta)
+2. En el dashboard, copia tu **Cloud name** (aparece arriba a la izquierda)
+3. Ve a **Settings → Upload → Upload presets → Add upload preset**
+4. Ponle un nombre, y en **Signing Mode** elige **Unsigned** — esto es lo que permite subir
+   fotos directamente desde el navegador del invitado sin pasar por tu servidor
+5. Guarda, y añade estas dos variables (en Cloudflare: tanto en "Build variables" como en
+   "Variables and Secrets" de runtime, igual que las de Clerk):
+   - `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME` → tu Cloud name
+   - `NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET` → el nombre del preset que acabas de crear
+
+Sin esto configurado, la sección de álbum simplemente no muestra el botón de subir foto
+(no rompe nada, solo queda inactiva).
+
+## Configurar las notificaciones por email (Resend)
+
+1. Crea una cuenta gratuita en https://resend.com (no pide tarjeta)
+2. **API Keys → Create API Key** → cópiala
+3. Añádela como variable — **esta va solo en "Variables and Secrets" de runtime, como
+   secret** (no hace falta en build, los emails se envían al recibir peticiones, no al
+   compilar):
+   - `RESEND_API_KEY`
+
+**Limitación real del plan gratuito sin dominio propio**: Resend solo te deja enviar
+emails a la dirección con la que te registraste, hasta que verifiques un dominio propio
+(gratis, pero necesitas tener un dominio y añadir un par de registros DNS — instrucciones
+en su dashboard, sección **Domains**). Hasta entonces, en la práctica solo tú recibirás las
+notificaciones aunque el código ya esté enviándolas para cualquier invitado.
+
+Sin `RESEND_API_KEY` configurada, el envío de emails simplemente se omite (se registra un
+aviso en los logs) — el RSVP se sigue guardando con normalidad.
 
 ## Notas de arquitectura
 
