@@ -1,7 +1,8 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Cormorant_Garamond, Jost } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
 import { Providers } from "./providers";
+import { PwaRegister } from "@/components/pwa-register";
 import "./globals.css";
 
 const display = Cormorant_Garamond({
@@ -25,6 +26,16 @@ export const metadata: Metadata = {
     description: "Invitaciones digitales premium para bodas y celebraciones.",
     type: "website",
   },
+  manifest: "/manifest.webmanifest",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "WeddingFlow",
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#151312",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -33,6 +44,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <html lang="es" suppressHydrationWarning>
         <body className={`${display.variable} ${body.variable} font-body antialiased`}>
           <Providers>{children}</Providers>
+          <PwaRegister />
         </body>
       </html>
     </ClerkProvider>
