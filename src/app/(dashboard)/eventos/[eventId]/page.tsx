@@ -11,7 +11,7 @@ const SECTIONS = [
   { href: "album", label: "Álbum", desc: "Moderar fotos subidas por los invitados" },
   { href: "colaboradores", label: "Colaboradores", desc: "Invita a otras personas a ayudarte" },
   { href: "regalos", label: "Lista de regalos", desc: "Se configura desde el wizard, paso 8" },
-  { href: "analytics", label: "Analytics", desc: "Visitas y confirmaciones (próximamente)" },
+  { href: "analytics", label: "Analytics", desc: "Visitas, dispositivos y embudo de confirmación" },
 ];
 
 const STATUS_LABEL: Record<string, string> = {

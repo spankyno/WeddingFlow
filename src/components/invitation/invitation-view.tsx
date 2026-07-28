@@ -12,12 +12,15 @@ import { TransportSection } from "@/components/invitation/sections/transport";
 import { FaqSection } from "@/components/invitation/sections/faq";
 import { MusicSection } from "@/components/invitation/sections/music";
 import { AlbumSection } from "@/components/invitation/sections/album";
+import { AddToCalendarButton } from "@/components/invitation/add-to-calendar-button";
 
 type EventRow = {
   slug: string;
   title: string;
   eventType: string;
   eventDate: string | null;
+  eventTime: string | null;
+  ceremonyLocationName: string | null;
   storyText: string | null;
   closingMessage: string | null;
 };
@@ -75,6 +78,14 @@ export function InvitationView({
         </h1>
         {event.eventDate && (
           <p className="mt-6 text-sm uppercase tracking-[0.3em] opacity-60">{event.eventDate}</p>
+        )}
+        {event.eventDate && (
+          <AddToCalendarButton
+            title={event.title}
+            eventDate={event.eventDate}
+            eventTime={event.eventTime}
+            location={event.ceremonyLocationName}
+          />
         )}
         {guest?.tableName && (
           <p className="mt-4 text-sm opacity-60">Tu mesa: {guest.tableName}</p>

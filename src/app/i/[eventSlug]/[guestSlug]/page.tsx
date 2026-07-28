@@ -1,8 +1,10 @@
 import { notFound } from "next/navigation";
+import { headers } from "next/headers";
 import { getEventBySlug } from "@/lib/db/queries/events";
 import { getGuestBySlug } from "@/lib/db/queries/guests";
 import { getTableById } from "@/lib/db/queries/tables";
 import { loadInvitationContent } from "@/lib/db/queries/invitation-content";
+import { recordVisit } from "@/lib/db/queries/analytics";
 import { InvitationView } from "@/components/invitation/invitation-view";
 
 export default async function PersonalizedInvitationPage({
@@ -21,6 +23,9 @@ export default async function PersonalizedInvitationPage({
     loadInvitationContent(event.id),
     guest.tableId ? getTableById(guest.tableId) : Promise.resolve(null),
   ]);
+
+  const headerList = await headers();
+  await recordVisit(event.id, headerList.get("user-agent"), headerList.get("referer"));
 
   return (
     <InvitationView
