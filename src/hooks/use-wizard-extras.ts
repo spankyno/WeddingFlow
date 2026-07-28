@@ -23,7 +23,7 @@ export function useAgenda(eventId: string) {
   return useQuery({
     queryKey: ["agenda", eventId],
     queryFn: async () => {
-      const res = await fetch(`/api/events/${eventId}/agenda`);
+      const res = await fetch(`/api/celebrations/${eventId}/agenda`);
       return jsonOrThrow(res, "Error al cargar la agenda") as Promise<{ items: any[] }>;
     },
   });
@@ -33,7 +33,7 @@ export function useCreateAgendaItem(eventId: string) {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (input: CreateAgendaItemInput) =>
-      fetch(`/api/events/${eventId}/agenda`, {
+      fetch(`/api/celebrations/${eventId}/agenda`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(input),
@@ -46,7 +46,7 @@ export function useDeleteAgendaItem(eventId: string) {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (itemId: string) =>
-      fetch(`/api/events/${eventId}/agenda/${itemId}`, { method: "DELETE" }).then((res) =>
+      fetch(`/api/celebrations/${eventId}/agenda/${itemId}`, { method: "DELETE" }).then((res) =>
         jsonOrThrow(res, "Error al eliminar el elemento")
       ),
     onSuccess: () => qc.invalidateQueries({ queryKey: ["agenda", eventId] }),
@@ -57,7 +57,7 @@ export function useReorderAgendaItems(eventId: string) {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (input: ReorderAgendaItemsInput) =>
-      fetch(`/api/events/${eventId}/agenda/reorder`, {
+      fetch(`/api/celebrations/${eventId}/agenda/reorder`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(input),
@@ -72,7 +72,7 @@ export function useDressCode(eventId: string) {
   return useQuery({
     queryKey: ["dress-code", eventId],
     queryFn: async () => {
-      const res = await fetch(`/api/events/${eventId}/dress-code`);
+      const res = await fetch(`/api/celebrations/${eventId}/dress-code`);
       return jsonOrThrow(res, "Error al cargar el dress code") as Promise<{ config: any }>;
     },
   });
@@ -82,7 +82,7 @@ export function useUpdateDressCode(eventId: string) {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (input: UpdateDressCodeInput) =>
-      fetch(`/api/events/${eventId}/dress-code`, {
+      fetch(`/api/celebrations/${eventId}/dress-code`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(input),
@@ -97,7 +97,7 @@ export function useGifts(eventId: string) {
   return useQuery({
     queryKey: ["gifts", eventId],
     queryFn: async () => {
-      const res = await fetch(`/api/events/${eventId}/gifts`);
+      const res = await fetch(`/api/celebrations/${eventId}/gifts`);
       return jsonOrThrow(res, "Error al cargar los regalos") as Promise<{ items: any[] }>;
     },
   });
@@ -107,7 +107,7 @@ export function useCreateGiftOption(eventId: string) {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (input: CreateGiftOptionInput) =>
-      fetch(`/api/events/${eventId}/gifts`, {
+      fetch(`/api/celebrations/${eventId}/gifts`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(input),
@@ -120,7 +120,7 @@ export function useDeleteGiftOption(eventId: string) {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (giftId: string) =>
-      fetch(`/api/events/${eventId}/gifts/${giftId}`, { method: "DELETE" }).then((res) =>
+      fetch(`/api/celebrations/${eventId}/gifts/${giftId}`, { method: "DELETE" }).then((res) =>
         jsonOrThrow(res, "Error al eliminar la opción")
       ),
     onSuccess: () => qc.invalidateQueries({ queryKey: ["gifts", eventId] }),
@@ -133,7 +133,7 @@ export function useHotels(eventId: string) {
   return useQuery({
     queryKey: ["hotels", eventId],
     queryFn: async () => {
-      const res = await fetch(`/api/events/${eventId}/hotels`);
+      const res = await fetch(`/api/celebrations/${eventId}/hotels`);
       return jsonOrThrow(res, "Error al cargar los hoteles") as Promise<{ items: any[] }>;
     },
   });
@@ -143,7 +143,7 @@ export function useCreateHotel(eventId: string) {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (input: CreateHotelInput) =>
-      fetch(`/api/events/${eventId}/hotels`, {
+      fetch(`/api/celebrations/${eventId}/hotels`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(input),
@@ -156,7 +156,7 @@ export function useDeleteHotel(eventId: string) {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (hotelId: string) =>
-      fetch(`/api/events/${eventId}/hotels/${hotelId}`, { method: "DELETE" }).then((res) =>
+      fetch(`/api/celebrations/${eventId}/hotels/${hotelId}`, { method: "DELETE" }).then((res) =>
         jsonOrThrow(res, "Error al eliminar el hotel")
       ),
     onSuccess: () => qc.invalidateQueries({ queryKey: ["hotels", eventId] }),
@@ -169,7 +169,7 @@ export function useTransportOptions(eventId: string) {
   return useQuery({
     queryKey: ["transport", eventId],
     queryFn: async () => {
-      const res = await fetch(`/api/events/${eventId}/transport`);
+      const res = await fetch(`/api/celebrations/${eventId}/transport`);
       return jsonOrThrow(res, "Error al cargar el transporte") as Promise<{ items: any[] }>;
     },
   });
@@ -179,7 +179,7 @@ export function useCreateTransportOption(eventId: string) {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (input: CreateTransportOptionInput) =>
-      fetch(`/api/events/${eventId}/transport`, {
+      fetch(`/api/celebrations/${eventId}/transport`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(input),
@@ -192,7 +192,7 @@ export function useDeleteTransportOption(eventId: string) {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (optionId: string) =>
-      fetch(`/api/events/${eventId}/transport/${optionId}`, { method: "DELETE" }).then((res) =>
+      fetch(`/api/celebrations/${eventId}/transport/${optionId}`, { method: "DELETE" }).then((res) =>
         jsonOrThrow(res, "Error al eliminar la opción")
       ),
     onSuccess: () => qc.invalidateQueries({ queryKey: ["transport", eventId] }),
@@ -205,7 +205,7 @@ export function useFaqs(eventId: string) {
   return useQuery({
     queryKey: ["faqs", eventId],
     queryFn: async () => {
-      const res = await fetch(`/api/events/${eventId}/faq`);
+      const res = await fetch(`/api/celebrations/${eventId}/faq`);
       return jsonOrThrow(res, "Error al cargar las preguntas") as Promise<{ items: any[] }>;
     },
   });
@@ -215,7 +215,7 @@ export function useCreateFaq(eventId: string) {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (input: CreateFaqInput) =>
-      fetch(`/api/events/${eventId}/faq`, {
+      fetch(`/api/celebrations/${eventId}/faq`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(input),
@@ -228,7 +228,7 @@ export function useDeleteFaq(eventId: string) {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (faqId: string) =>
-      fetch(`/api/events/${eventId}/faq/${faqId}`, { method: "DELETE" }).then((res) =>
+      fetch(`/api/celebrations/${eventId}/faq/${faqId}`, { method: "DELETE" }).then((res) =>
         jsonOrThrow(res, "Error al eliminar la pregunta")
       ),
     onSuccess: () => qc.invalidateQueries({ queryKey: ["faqs", eventId] }),
@@ -239,7 +239,7 @@ export function useReorderFaqs(eventId: string) {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (input: ReorderFaqsInput) =>
-      fetch(`/api/events/${eventId}/faq/reorder`, {
+      fetch(`/api/celebrations/${eventId}/faq/reorder`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(input),

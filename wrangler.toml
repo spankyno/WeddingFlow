@@ -11,7 +11,7 @@ binding = "ASSETS"
 [[d1_databases]]
 binding = "DB"
 database_name = "weddingflow"
-database_id = "REPLACE_WITH_YOUR_D1_DATABASE_ID"
+database_id = "9f8ea956-80ca-40c0-a22f-fb16c7a09208"
 
 # Cron trigger para recordatorios automáticos (Fase 2)
 [triggers]

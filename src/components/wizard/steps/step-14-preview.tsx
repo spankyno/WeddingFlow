@@ -10,7 +10,7 @@ export function Step14Preview({ eventId }: { eventId: string }) {
   const { data, isLoading } = useQuery({
     queryKey: ["event", eventId],
     queryFn: async () => {
-      const res = await fetch(`/api/events/${eventId}`);
+      const res = await fetch(`/api/celebrations/${eventId}`);
       if (!res.ok) throw new Error("Error al cargar el evento");
       return res.json() as Promise<{ event: any }>;
     },

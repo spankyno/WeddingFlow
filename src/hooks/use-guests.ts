@@ -12,7 +12,7 @@ type GuestStats = {
 };
 
 async function fetchGuests(eventId: string) {
-  const res = await fetch(`/api/events/${eventId}/guests`);
+  const res = await fetch(`/api/celebrations/${eventId}/guests`);
   if (!res.ok) throw new Error("Error al cargar invitados");
   return (await res.json()) as { items: any[]; stats: GuestStats };
 }
@@ -25,7 +25,7 @@ export function useCreateGuest(eventId: string) {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (input: CreateGuestInput) => {
-      const res = await fetch(`/api/events/${eventId}/guests`, {
+      const res = await fetch(`/api/celebrations/${eventId}/guests`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(input),
@@ -41,7 +41,7 @@ export function useUpdateGuest(eventId: string) {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async ({ guestId, input }: { guestId: string; input: UpdateGuestInput }) => {
-      const res = await fetch(`/api/events/${eventId}/guests/${guestId}`, {
+      const res = await fetch(`/api/celebrations/${eventId}/guests/${guestId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(input),
@@ -57,7 +57,7 @@ export function useDeleteGuest(eventId: string) {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (guestId: string) => {
-      const res = await fetch(`/api/events/${eventId}/guests/${guestId}`, { method: "DELETE" });
+      const res = await fetch(`/api/celebrations/${eventId}/guests/${guestId}`, { method: "DELETE" });
       if (!res.ok) throw new Error("Error al eliminar invitado");
       return res.json();
     },
@@ -69,7 +69,7 @@ export function useImportGuests(eventId: string) {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (guests: CreateGuestInput[]) => {
-      const res = await fetch(`/api/events/${eventId}/guests/import`, {
+      const res = await fetch(`/api/celebrations/${eventId}/guests/import`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ guests }),

@@ -9,7 +9,7 @@ export function useTheme(eventId: string) {
   return useQuery({
     queryKey: ["theme", eventId],
     queryFn: async () => {
-      const res = await fetch(`/api/events/${eventId}/theme`);
+      const res = await fetch(`/api/celebrations/${eventId}/theme`);
       if (!res.ok) throw new Error("Error al cargar el tema");
       return res.json() as Promise<{ theme: any }>;
     },
@@ -20,7 +20,7 @@ export function useUpdateTheme(eventId: string) {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (input: UpdateThemeInput) => {
-      const res = await fetch(`/api/events/${eventId}/theme`, {
+      const res = await fetch(`/api/celebrations/${eventId}/theme`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(input),
@@ -38,7 +38,7 @@ export function useSections(eventId: string) {
   return useQuery({
     queryKey: ["sections", eventId],
     queryFn: async () => {
-      const res = await fetch(`/api/events/${eventId}/sections`);
+      const res = await fetch(`/api/celebrations/${eventId}/sections`);
       if (!res.ok) throw new Error("Error al cargar las secciones");
       return res.json() as Promise<{ items: any[] }>;
     },
@@ -49,7 +49,7 @@ export function useUpdateSections(eventId: string) {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (input: UpdateSectionsInput) => {
-      const res = await fetch(`/api/events/${eventId}/sections`, {
+      const res = await fetch(`/api/celebrations/${eventId}/sections`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(input),
@@ -67,7 +67,7 @@ export function useRsvpConfig(eventId: string) {
   return useQuery({
     queryKey: ["rsvp-config", eventId],
     queryFn: async () => {
-      const res = await fetch(`/api/events/${eventId}/rsvp-config`);
+      const res = await fetch(`/api/celebrations/${eventId}/rsvp-config`);
       if (!res.ok) throw new Error("Error al cargar la configuración de RSVP");
       return res.json() as Promise<{ config: any }>;
     },
@@ -78,7 +78,7 @@ export function useUpdateRsvpConfig(eventId: string) {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (input: UpdateRsvpConfigInput) => {
-      const res = await fetch(`/api/events/${eventId}/rsvp-config`, {
+      const res = await fetch(`/api/celebrations/${eventId}/rsvp-config`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(input),
@@ -96,7 +96,7 @@ export function useUpdateEventDetails(eventId: string) {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (input: UpdateEventDetailsInput) => {
-      const res = await fetch(`/api/events/${eventId}`, {
+      const res = await fetch(`/api/celebrations/${eventId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(input),
