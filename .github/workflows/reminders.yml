@@ -1,0 +1,15 @@
+name: Enviar recordatorios diarios
+
+on:
+  schedule:
+    - cron: "0 8 * * *"
+  workflow_dispatch: {}
+
+jobs:
+  send-reminders:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Llamar al endpoint de recordatorios
+        run: |
+          curl -sf -X POST "https://weddingflow.kbo1.workers.dev/api/system/cron/reminders" \
+            -H "x-cron-secret: ${{ secrets.CRON_SECRET }}"
