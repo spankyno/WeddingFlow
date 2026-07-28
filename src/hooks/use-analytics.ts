@@ -12,6 +12,9 @@ export function useAnalyticsSummary(eventId: string) {
         totalVisits: number;
         visitsByDay: { date: string; count: number }[];
         deviceBreakdown: Record<string, number>;
+        clickShare: number;
+        downloadPdf: number;
+        downloadImage: number;
         guestStats: {
           total: number;
           confirmed: number;

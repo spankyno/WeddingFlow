@@ -13,6 +13,8 @@ import { FaqSection } from "@/components/invitation/sections/faq";
 import { MusicSection } from "@/components/invitation/sections/music";
 import { AlbumSection } from "@/components/invitation/sections/album";
 import { AddToCalendarButton } from "@/components/invitation/add-to-calendar-button";
+import { DownloadPdfButton } from "@/components/invitation/download-pdf-button";
+import { DownloadImageButton } from "@/components/invitation/download-image-button";
 
 type EventRow = {
   slug: string;
@@ -64,7 +66,7 @@ export function InvitationView({
           .join("&")}&display=swap`}
       />
 
-      <section className="flex h-screen flex-col items-center justify-center text-center">
+      <section id="invitation-hero" className="flex h-screen flex-col items-center justify-center text-center">
         <p className="text-xs uppercase tracking-[0.4em]" style={{ color: theme?.colorSecondary ?? undefined }}>
           {event.eventType === "wedding" ? "Nos casamos" : "Os esperamos"}
         </p>
@@ -87,6 +89,22 @@ export function InvitationView({
             location={event.ceremonyLocationName}
           />
         )}
+        <div className="mt-3 flex flex-wrap justify-center gap-3">
+          <DownloadPdfButton
+            eventSlug={event.slug}
+            title={event.title}
+            eventDate={event.eventDate}
+            eventTime={event.eventTime}
+            location={event.ceremonyLocationName}
+            guestName={guest?.fullName}
+            publicPath={guest ? `/i/${event.slug}/${guest.uniqueSlug}` : `/i/${event.slug}`}
+          />
+          <DownloadImageButton
+            eventSlug={event.slug}
+            targetId="invitation-hero"
+            fileName={`invitacion-${event.slug}`}
+          />
+        </div>
         {guest?.tableName && (
           <p className="mt-4 text-sm opacity-60">Tu mesa: {guest.tableName}</p>
         )}

@@ -53,10 +53,17 @@ export async function getAnalyticsSummary(eventId: string) {
 
   const guestStats = await getGuestStats(eventId);
 
+  const clickShare = all.filter((e) => e.type === "click_share").length;
+  const downloadPdf = all.filter((e) => e.type === "download_pdf").length;
+  const downloadImage = all.filter((e) => e.type === "download_image").length;
+
   return {
     totalVisits: visits.length,
     visitsByDay: days,
     deviceBreakdown,
     guestStats,
+    clickShare,
+    downloadPdf,
+    downloadImage,
   };
 }

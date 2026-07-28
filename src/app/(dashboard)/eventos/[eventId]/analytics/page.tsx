@@ -104,6 +104,25 @@ export default function AnalyticsPage({ params }: { params: Promise<{ eventId: s
           </div>
         </div>
       </div>
+      <div className="mt-10 max-w-sm">
+        <p className="font-body text-xs uppercase tracking-widest text-ink/50">
+          Compartir y descargas
+        </p>
+        <div className="mt-4 space-y-2 text-sm">
+          <div className="flex justify-between">
+            <span className="text-ink/60">Clics en compartir</span>
+            <span>{data.clickShare}</span>
+          </div>
+          <div className="flex justify-between">
+            <span className="text-ink/60">Descargas de PDF</span>
+            <span>{data.downloadPdf}</span>
+          </div>
+          <div className="flex justify-between">
+            <span className="text-ink/60">Descargas de imagen</span>
+            <span>{data.downloadImage}</span>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
