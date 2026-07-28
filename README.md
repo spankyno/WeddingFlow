@@ -289,6 +289,31 @@ El binding `DB` (D1) ya queda conectado automáticamente porque está declarado 
 En el dashboard: Workers & Pages → weddingflow → Settings → Domains & Routes → Add Custom
 Domain. Una vez añadido, actualiza el webhook de Clerk del paso 3 con el dominio definitivo.
 
+## Configurar los recordatorios automáticos diarios
+
+Cloudflare Workers no permite añadir un cron nativo sin reconstruir a mano el Worker que
+genera OpenNext (arriesgado). En su lugar, se usa un endpoint HTTP protegido
+(`/api/system/cron/reminders`) que dispara diariamente un workflow de **GitHub Actions**
+(gratis, ya incluido en tu repo en `.github/workflows/reminders.yml`). Cada día revisa si
+hay eventos a 7 días vista con invitados sin confirmar (les manda un recordatorio) o eventos
+de hace 1 día (manda un agradecimiento a los confirmados).
+
+1. Genera un secreto cualquiera (por ejemplo, con https://www.uuidgenerator.net/ o
+   cualquier cadena larga aleatoria que se te ocurra)
+2. Añádelo en **Cloudflare → tu Worker → Settings → Variables and Secrets** como secret:
+   - `CRON_SECRET`
+3. Añade el mismo valor en **GitHub → tu repo → Settings → Secrets and variables →
+   Actions → New repository secret**:
+   - Nombre: `CRON_SECRET`
+   - Valor: el mismo que pusiste en Cloudflare
+4. Revisa que la URL dentro de `.github/workflows/reminders.yml` coincide con tu dominio
+   real (`weddingflow.<tu-subdominio>.workers.dev` o tu dominio propio si has añadido uno)
+5. El workflow se ejecuta solo cada día a las 8:00 UTC. Para probarlo ya mismo sin esperar:
+   en GitHub, pestaña **Actions → Enviar recordatorios diarios → Run workflow**
+
+Sin `CRON_SECRET` configurado en Cloudflare, el endpoint devuelve error 500 en vez de
+enviar nada — no falla de forma silenciosa.
+
 ## Configurar el álbum colaborativo (Cloudinary)
 
 1. Crea una cuenta gratuita en https://cloudinary.com (no pide tarjeta)

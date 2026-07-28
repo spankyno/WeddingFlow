@@ -49,3 +49,31 @@ export function collaboratorInviteEmail(params: { eventTitle: string; inviterEma
     </div>
   `;
 }
+
+export function rsvpReminderEmail(params: { eventTitle: string; guestName: string; invitationUrl: string }) {
+  const { eventTitle, guestName, invitationUrl } = params;
+  return `
+    <div style="font-family: sans-serif; max-width: 480px;">
+      <h2>¡Ya casi es el gran día!</h2>
+      <p>Hola ${guestName},</p>
+      <p>
+        <strong>${eventTitle}</strong> es dentro de muy poco y todavía no hemos recibido tu
+        confirmación de asistencia. ¿Nos ayudas a confirmarla?
+      </p>
+      <p><a href="${invitationUrl}" style="display:inline-block; background:#1c1c1c; color:#fff; padding:10px 20px; border-radius:24px; text-decoration:none;">Confirmar asistencia</a></p>
+      <p style="color:#888; font-size:12px; margin-top:24px;">WeddingFlow</p>
+    </div>
+  `;
+}
+
+export function thankYouEmail(params: { eventTitle: string; guestName: string }) {
+  const { eventTitle, guestName } = params;
+  return `
+    <div style="font-family: sans-serif; max-width: 480px;">
+      <h2>¡Gracias por celebrarlo con nosotros!</h2>
+      <p>Hola ${guestName},</p>
+      <p>Gracias de corazón por acompañarnos en <strong>${eventTitle}</strong>. Fue un día muy especial gracias a vosotros.</p>
+      <p style="color:#888; font-size:12px; margin-top:24px;">WeddingFlow</p>
+    </div>
+  `;
+}
