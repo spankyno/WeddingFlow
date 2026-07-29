@@ -78,7 +78,13 @@ Objetivo: un usuario puede registrarse, crear **una** boda, personalizarla míni
 11. Añadir al calendario (ICS genérico que sirve para Apple/Google/Outlook, sin integraciones OAuth)
 12. Analytics básico: visitas, confirmaciones, dispositivo (user-agent), sin librería de terceros — tabla propia `analytics_event` (la tabla y el registro de eventos `rsvp_submit` ya existen; falta el panel de visualización)
 13. ✅ Roles: administrador/dueño con control total, colaboradores (cualquier rol) con acceso de edición a invitados/mesas/wizard/contenido — invitación por email con vinculación automática al crear cuenta. Pendiente para más adelante: permisos más granulares por rol específico (hoy todos los roles de colaborador tienen el mismo nivel de acceso)
-14. Editor visual tipo Canva simplificado: reordenar secciones (drag & drop de bloques ya definidos) + editar colores/tipografía por bloque. **No** es un editor de layout libre tipo Canva real (eso es Fase 3, altísimo coste); en 1.0 es "reordenar y personalizar bloques predefinidos". Nota: el paso 5 del wizard ya permite reordenar/activar secciones — falta el editor de colores/tipografía *por bloque* (hoy es global para toda la invitación)
+14. ✅ Editor visual simplificado: reordenar/activar secciones (paso 5) + personalizar color
+    de fondo y de texto **por sección individual** (botón "Personalizar" en cada fila del
+    paso 5), heredando el tema global cuando no se toca. Alcance real, no lo que decía el
+    plan original: no incluye tipografía ni color de acento por bloque (requeriría tocar
+    cada componente de sección uno a uno para que el acento se viera reflejado de verdad —
+    se dejó fuera antes que fingir un control que no hace nada visible). Tampoco es un
+    editor de layout libre tipo Canva (eso es Fase 3, altísimo coste)
 15. PWA: manifest + service worker básico (cache de assets estáticos, no offline-first completo)
 16. ✅ Motor multi-evento: `events.event_type` (boda, comunión, bautizo, cumpleaños, corporativo) ya reutiliza el mismo modelo de datos desde el principio
 

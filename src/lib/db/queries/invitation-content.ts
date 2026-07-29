@@ -24,6 +24,18 @@ export async function loadInvitationContent(eventId: string) {
       .map((s) => s.sectionKey)
   );
 
+  const sectionStyles: Record<string, { colorBackground?: string; colorText?: string }> = {};
+  for (const s of sections) {
+    try {
+      const parsed = JSON.parse(s.styleOverrides || "{}");
+      if (parsed && typeof parsed === "object" && Object.keys(parsed).length > 0) {
+        sectionStyles[s.sectionKey] = parsed;
+      }
+    } catch {
+      // JSON corrupto o vacío: se ignora, esa sección simplemente hereda el tema global
+    }
+  }
+
   // Solo se consulta cada tabla si su sección está activa, para no hacer trabajo de más.
   const [agenda, dressCodeConfig, gifts, hotelsList, transport, faqs, songs, albumPhotos] = await Promise.all([
     enabledKeys.has("agenda") ? listAgendaItems(eventId) : Promise.resolve([]),
@@ -39,6 +51,7 @@ export async function loadInvitationContent(eventId: string) {
   return {
     theme,
     enabledKeys,
+    sectionStyles,
     rsvpConfig,
     agenda,
     dressCodeConfig,

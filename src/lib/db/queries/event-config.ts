@@ -52,7 +52,13 @@ export async function updateSections(eventId: string, input: UpdateSectionsInput
   for (const section of input.sections) {
     await db
       .update(eventSections)
-      .set({ isEnabled: section.isEnabled, sortOrder: section.sortOrder })
+      .set({
+        isEnabled: section.isEnabled,
+        sortOrder: section.sortOrder,
+        ...(section.styleOverrides !== undefined && {
+          styleOverrides: JSON.stringify(section.styleOverrides),
+        }),
+      })
       .where(
         and(eq(eventSections.eventId, eventId), eq(eventSections.sectionKey, section.sectionKey))
       );

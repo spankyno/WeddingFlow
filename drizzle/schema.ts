@@ -162,6 +162,9 @@ export const eventSections = sqliteTable(
     sectionKey: text("section_key", { enum: sectionKeyEnum }).notNull(),
     isEnabled: integer("is_enabled", { mode: "boolean" }).notNull().default(true),
     sortOrder: integer("sort_order").notNull().default(0),
+    // JSON con overrides opcionales de esta sección concreta: colorBackground, colorText,
+    // colorAccent, fontHeading. Cualquier campo ausente hereda el tema global del evento.
+    styleOverrides: text("style_overrides").notNull().default("{}"),
   },
   (table) => ({
     eventIdx: index("event_sections_event_idx").on(table.eventId),

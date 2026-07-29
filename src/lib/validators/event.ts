@@ -45,6 +45,12 @@ export const rsvpSubmitSchema = z.object({
 
 export type RsvpSubmitInput = z.infer<typeof rsvpSubmitSchema>;
 
+export const sectionStyleOverridesSchema = z.object({
+  colorBackground: z.string().regex(/^#[0-9a-fA-F]{6}$/).optional(),
+  colorText: z.string().regex(/^#[0-9a-fA-F]{6}$/).optional(),
+});
+export type SectionStyleOverrides = z.infer<typeof sectionStyleOverridesSchema>;
+
 export const updateSectionsSchema = z.object({
   sections: z
     .array(
@@ -52,6 +58,7 @@ export const updateSectionsSchema = z.object({
         sectionKey: z.enum(sectionKeyEnum),
         isEnabled: z.boolean(),
         sortOrder: z.number().int().min(0),
+        styleOverrides: sectionStyleOverridesSchema.optional(),
       })
     )
     .min(1),

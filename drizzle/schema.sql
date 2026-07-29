@@ -74,7 +74,8 @@ CREATE TABLE event_sections (
   section_key TEXT NOT NULL
     CHECK (section_key IN ('story','countdown','gallery','video','map','agenda','dress_code','gifts','rsvp','hotels','transport','faq','contact','music','album')),
   is_enabled INTEGER NOT NULL DEFAULT 1,
-  sort_order INTEGER NOT NULL DEFAULT 0
+  sort_order INTEGER NOT NULL DEFAULT 0,
+  style_overrides TEXT NOT NULL DEFAULT '{}'
 );
 CREATE INDEX event_sections_event_idx ON event_sections(event_id);
 CREATE UNIQUE INDEX event_sections_unique_idx ON event_sections(event_id, section_key);

@@ -15,6 +15,7 @@ import { AlbumSection } from "@/components/invitation/sections/album";
 import { AddToCalendarButton } from "@/components/invitation/add-to-calendar-button";
 import { DownloadPdfButton } from "@/components/invitation/download-pdf-button";
 import { DownloadImageButton } from "@/components/invitation/download-image-button";
+import { SectionStyleWrapper } from "@/components/invitation/section-style-wrapper";
 
 type EventRow = {
   slug: string;
@@ -110,28 +111,65 @@ export function InvitationView({
         )}
       </section>
 
-      {enabledKeys.has("countdown") && event.eventDate && <CountdownSection targetDate={event.eventDate} />}
-      {enabledKeys.has("story") && event.storyText && <StorySection text={event.storyText} />}
-      {enabledKeys.has("agenda") && <AgendaSection items={content.agenda} />}
-      {enabledKeys.has("dress_code") && content.dressCodeConfig && (
-        <DressCodeSection config={content.dressCodeConfig} />
+      {enabledKeys.has("countdown") && event.eventDate && (
+        <SectionStyleWrapper override={content.sectionStyles.countdown}>
+          <CountdownSection targetDate={event.eventDate} />
+        </SectionStyleWrapper>
       )}
-      {enabledKeys.has("hotels") && <HotelsSection items={content.hotelsList} />}
-      {enabledKeys.has("transport") && <TransportSection items={content.transport} />}
-      {enabledKeys.has("gifts") && <GiftsSection items={content.gifts} />}
+      {enabledKeys.has("story") && event.storyText && (
+        <SectionStyleWrapper override={content.sectionStyles.story}>
+          <StorySection text={event.storyText} />
+        </SectionStyleWrapper>
+      )}
+      {enabledKeys.has("agenda") && (
+        <SectionStyleWrapper override={content.sectionStyles.agenda}>
+          <AgendaSection items={content.agenda} />
+        </SectionStyleWrapper>
+      )}
+      {enabledKeys.has("dress_code") && content.dressCodeConfig && (
+        <SectionStyleWrapper override={content.sectionStyles.dress_code}>
+          <DressCodeSection config={content.dressCodeConfig} />
+        </SectionStyleWrapper>
+      )}
+      {enabledKeys.has("hotels") && (
+        <SectionStyleWrapper override={content.sectionStyles.hotels}>
+          <HotelsSection items={content.hotelsList} />
+        </SectionStyleWrapper>
+      )}
+      {enabledKeys.has("transport") && (
+        <SectionStyleWrapper override={content.sectionStyles.transport}>
+          <TransportSection items={content.transport} />
+        </SectionStyleWrapper>
+      )}
+      {enabledKeys.has("gifts") && (
+        <SectionStyleWrapper override={content.sectionStyles.gifts}>
+          <GiftsSection items={content.gifts} />
+        </SectionStyleWrapper>
+      )}
       {enabledKeys.has("music") && (
-        <MusicSection eventSlug={event.slug} guestSlug={guest?.uniqueSlug} approvedSongs={content.songs} />
+        <SectionStyleWrapper override={content.sectionStyles.music}>
+          <MusicSection eventSlug={event.slug} guestSlug={guest?.uniqueSlug} approvedSongs={content.songs} />
+        </SectionStyleWrapper>
       )}
       {enabledKeys.has("album") && (
-        <AlbumSection eventSlug={event.slug} guestSlug={guest?.uniqueSlug} approvedPhotos={content.albumPhotos} />
+        <SectionStyleWrapper override={content.sectionStyles.album}>
+          <AlbumSection eventSlug={event.slug} guestSlug={guest?.uniqueSlug} approvedPhotos={content.albumPhotos} />
+        </SectionStyleWrapper>
       )}
-      {enabledKeys.has("rsvp") &&
-        (guest ? (
-          <RsvpSection guestSlug={guest.uniqueSlug} config={content.rsvpConfig ?? undefined} />
-        ) : (
-          <GuestLookupSection eventSlug={event.slug} />
-        ))}
-      {enabledKeys.has("faq") && <FaqSection items={content.faqs} />}
+      {enabledKeys.has("rsvp") && (
+        <SectionStyleWrapper override={content.sectionStyles.rsvp}>
+          {guest ? (
+            <RsvpSection guestSlug={guest.uniqueSlug} config={content.rsvpConfig ?? undefined} />
+          ) : (
+            <GuestLookupSection eventSlug={event.slug} />
+          )}
+        </SectionStyleWrapper>
+      )}
+      {enabledKeys.has("faq") && (
+        <SectionStyleWrapper override={content.sectionStyles.faq}>
+          <FaqSection items={content.faqs} />
+        </SectionStyleWrapper>
+      )}
       {event.closingMessage && <ClosingMessageSection text={event.closingMessage} />}
     </main>
   );
