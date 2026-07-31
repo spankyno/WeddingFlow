@@ -7,6 +7,7 @@ const SECTIONS = [
   { href: "wizard/1", label: "Editar invitación", desc: "Retoma el wizard en cualquier paso" },
   { href: "invitados", label: "Invitados", desc: "Alta manual, import Excel, QR, confirmaciones" },
   { href: "mesas", label: "Mesas", desc: "Editor visual drag & drop de distribución" },
+  { href: "galeria", label: "Galería", desc: "Fotos oficiales y vídeo (YouTube/Vimeo)" },
   { href: "musica", label: "Música", desc: "Aprobar o rechazar canciones sugeridas" },
   { href: "album", label: "Álbum", desc: "Moderar fotos subidas por los invitados" },
   { href: "colaboradores", label: "Colaboradores", desc: "Invita a otras personas a ayudarte" },

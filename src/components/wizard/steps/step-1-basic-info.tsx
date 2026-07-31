@@ -57,14 +57,25 @@ export function Step1BasicInfo() {
         </div>
       </div>
 
-      <div>
-        <label className="font-body text-xs uppercase tracking-widest text-ink/60">
-          Lugar de la ceremonia
-        </label>
-        <input
-          {...register("ceremonyLocationName")}
-          className="mt-2 w-full border-b border-ink/25 bg-transparent py-3 outline-none focus:border-gold-dark"
-        />
+      <div className="grid grid-cols-2 gap-6">
+        <div>
+          <label className="font-body text-xs uppercase tracking-widest text-ink/60">
+            Lugar de la ceremonia
+          </label>
+          <input
+            {...register("ceremonyLocationName")}
+            className="mt-2 w-full border-b border-ink/25 bg-transparent py-3 outline-none focus:border-gold-dark"
+          />
+        </div>
+        <div>
+          <label className="font-body text-xs uppercase tracking-widest text-ink/60">
+            Lugar de la celebración (si es distinto)
+          </label>
+          <input
+            {...register("celebrationLocationName")}
+            className="mt-2 w-full border-b border-ink/25 bg-transparent py-3 outline-none focus:border-gold-dark"
+          />
+        </div>
       </div>
 
       <div>

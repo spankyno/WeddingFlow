@@ -12,6 +12,9 @@ import { TransportSection } from "@/components/invitation/sections/transport";
 import { FaqSection } from "@/components/invitation/sections/faq";
 import { MusicSection } from "@/components/invitation/sections/music";
 import { AlbumSection } from "@/components/invitation/sections/album";
+import { GallerySection } from "@/components/invitation/sections/gallery";
+import { VideoSection } from "@/components/invitation/sections/video";
+import { MapSection } from "@/components/invitation/sections/map";
 import { AddToCalendarButton } from "@/components/invitation/add-to-calendar-button";
 import { DownloadPdfButton } from "@/components/invitation/download-pdf-button";
 import { DownloadImageButton } from "@/components/invitation/download-image-button";
@@ -24,6 +27,7 @@ type EventRow = {
   eventDate: string | null;
   eventTime: string | null;
   ceremonyLocationName: string | null;
+  celebrationLocationName: string | null;
   storyText: string | null;
   closingMessage: string | null;
 };
@@ -121,6 +125,16 @@ export function InvitationView({
           <StorySection text={event.storyText} />
         </SectionStyleWrapper>
       )}
+      {enabledKeys.has("gallery") && (
+        <SectionStyleWrapper override={content.sectionStyles.gallery}>
+          <GallerySection items={content.galleryImages} />
+        </SectionStyleWrapper>
+      )}
+      {enabledKeys.has("video") && (
+        <SectionStyleWrapper override={content.sectionStyles.video}>
+          <VideoSection items={content.galleryVideos} />
+        </SectionStyleWrapper>
+      )}
       {enabledKeys.has("agenda") && (
         <SectionStyleWrapper override={content.sectionStyles.agenda}>
           <AgendaSection items={content.agenda} />
@@ -129,6 +143,14 @@ export function InvitationView({
       {enabledKeys.has("dress_code") && content.dressCodeConfig && (
         <SectionStyleWrapper override={content.sectionStyles.dress_code}>
           <DressCodeSection config={content.dressCodeConfig} />
+        </SectionStyleWrapper>
+      )}
+      {enabledKeys.has("map") && (
+        <SectionStyleWrapper override={content.sectionStyles.map}>
+          <MapSection
+            ceremonyLocationName={event.ceremonyLocationName}
+            celebrationLocationName={event.celebrationLocationName}
+          />
         </SectionStyleWrapper>
       )}
       {enabledKeys.has("hotels") && (

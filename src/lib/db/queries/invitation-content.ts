@@ -9,6 +9,7 @@ import {
 } from "@/lib/db/queries/wizard-extras";
 import { listApprovedSongSuggestions } from "@/lib/db/queries/songs";
 import { listApprovedAlbumPhotos } from "@/lib/db/queries/album";
+import { listEventMedia } from "@/lib/db/queries/event-media";
 
 export async function loadInvitationContent(eventId: string) {
   const [theme, sections, rsvpConfig] = await Promise.all([
@@ -37,7 +38,7 @@ export async function loadInvitationContent(eventId: string) {
   }
 
   // Solo se consulta cada tabla si su sección está activa, para no hacer trabajo de más.
-  const [agenda, dressCodeConfig, gifts, hotelsList, transport, faqs, songs, albumPhotos] = await Promise.all([
+  const [agenda, dressCodeConfig, gifts, hotelsList, transport, faqs, songs, albumPhotos, media] = await Promise.all([
     enabledKeys.has("agenda") ? listAgendaItems(eventId) : Promise.resolve([]),
     enabledKeys.has("dress_code") ? getDressCodeForEvent(eventId) : Promise.resolve(null),
     enabledKeys.has("gifts") ? listGiftOptions(eventId) : Promise.resolve([]),
@@ -46,7 +47,11 @@ export async function loadInvitationContent(eventId: string) {
     enabledKeys.has("faq") ? listFaqs(eventId) : Promise.resolve([]),
     enabledKeys.has("music") ? listApprovedSongSuggestions(eventId) : Promise.resolve([]),
     enabledKeys.has("album") ? listApprovedAlbumPhotos(eventId) : Promise.resolve([]),
+    enabledKeys.has("gallery") || enabledKeys.has("video") ? listEventMedia(eventId) : Promise.resolve([]),
   ]);
+
+  const galleryImages = media.filter((m) => m.type === "image");
+  const galleryVideos = media.filter((m) => m.type === "video");
 
   return {
     theme,
@@ -61,6 +66,8 @@ export async function loadInvitationContent(eventId: string) {
     faqs,
     songs,
     albumPhotos,
+    galleryImages,
+    galleryVideos,
   };
 }
 

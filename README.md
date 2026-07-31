@@ -204,6 +204,19 @@ Cloudflare.
 
 ---
 
+## Pruebas
+
+Cubren la lógica pura más sensible a errores silenciosos: import de Excel (mapeo de
+columnas, detección de booleanos, normalización de filas), validadores de invitados/RSVP,
+generación de `.ics`, e integridad de los presets de tema.
+
+```bash
+npm test            # corre toda la suite una vez
+npm run test:watch  # modo watch, útil mientras desarrollas
+```
+
+No requieren CLI de Cloudflare ni base de datos — son pruebas unitarias puras con Vitest.
+
 ## Alternativa: despliegue con CLI en local
 
 Si en el futuro quieres usar terminal (por ejemplo, para trabajar con Claude Code u otro
