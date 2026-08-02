@@ -87,6 +87,17 @@ Objetivo: un usuario puede registrarse, crear **una** boda, personalizarla míni
     editor de layout libre tipo Canva (eso es Fase 3, altísimo coste)
 15. PWA: manifest + service worker básico (cache de assets estáticos, no offline-first completo)
 16. ✅ Motor multi-evento: `events.event_type` (boda, comunión, bautizo, cumpleaños, corporativo) ya reutiliza el mismo modelo de datos desde el principio
+17. ✅ Panel multi-cliente: gestión de organizaciones (`/organizaciones` — crear, renombrar,
+    eliminar), asignación opcional al crear un evento, y el dashboard agrupa
+    automáticamente por cliente en cuanto el usuario tiene alguna organización creada. Útil
+    para Wedding Planners con varios clientes en la misma cuenta
+18. ✅ Galería, vídeo y mapa embebido: las 3 secciones del wizard que quedaban sin
+    componente visual en la invitación pública. Galería y vídeo se gestionan desde
+    `/eventos/[id]/galeria` (fotos vía Cloudinary, vídeo pegando URL de YouTube/Vimeo); el
+    mapa usa el lugar de ceremonia/celebración ya capturado en el paso 1 (embed de Google
+    Maps por texto de dirección, sin necesitar API key ni coordenadas)
+19. ✅ Pruebas unitarias (Vitest): import de Excel, validadores de invitados/RSVP,
+    generación de `.ics`, integridad de presets de tema — 40 tests, `npm test`
 
 **Entregable**: producto con paridad funcional completa frente al spec, listo para primeros usuarios reales.
 

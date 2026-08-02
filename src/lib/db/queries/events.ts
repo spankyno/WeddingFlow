@@ -54,6 +54,7 @@ export async function createEvent(userId: string, input: CreateEventInput) {
   await db.insert(events).values({
     id,
     ownerUserId: userId,
+    organizationId: input.organizationId || null,
     eventType: input.eventType,
     slug,
     title: input.title,

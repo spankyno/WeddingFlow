@@ -4,11 +4,13 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { createEventSchema, type CreateEventInput } from "@/lib/validators/event";
 import { useCreateEvent } from "@/hooks/use-events";
+import { useOrganizations } from "@/hooks/use-organizations";
 import { useRouter } from "next/navigation";
 
 export function Step1BasicInfo() {
   const router = useRouter();
   const { mutateAsync, isPending } = useCreateEvent();
+  const { data: orgsData } = useOrganizations();
 
   const {
     register,
@@ -88,6 +90,25 @@ export function Step1BasicInfo() {
           className="mt-2 w-full border-b border-ink/25 bg-transparent py-3 outline-none focus:border-gold-dark"
         />
       </div>
+
+      {orgsData && orgsData.items.length > 0 && (
+        <div>
+          <label className="font-body text-xs uppercase tracking-widest text-ink/60">
+            Organización / cliente (opcional)
+          </label>
+          <select
+            {...register("organizationId")}
+            className="mt-2 w-full border-b border-ink/25 bg-transparent py-3 outline-none focus:border-gold-dark"
+          >
+            <option value="">Sin organización</option>
+            {orgsData.items.map((org: any) => (
+              <option key={org.id} value={org.id}>
+                {org.name}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
 
       <button
         type="submit"

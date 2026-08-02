@@ -4,6 +4,7 @@ import { UserButton } from "@clerk/nextjs";
 const NAV = [
   { href: "/dashboard", label: "Resumen" },
   { href: "/eventos", label: "Mis eventos" },
+  { href: "/organizaciones", label: "Organizaciones" },
 ];
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {

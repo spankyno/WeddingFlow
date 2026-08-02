@@ -16,6 +16,7 @@ export const createEventSchema = z.object({
   celebrationLat: z.number().min(-90).max(90).optional(),
   celebrationLng: z.number().min(-180).max(180).optional(),
   storyText: z.string().max(4000).optional(),
+  organizationId: z.string().optional(),
 });
 
 export type CreateEventInput = z.infer<typeof createEventSchema>;
