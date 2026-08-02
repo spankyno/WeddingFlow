@@ -89,8 +89,13 @@ export async function createGuest(eventId: string, input: CreateGuestInput) {
 
 /**
  * Alta masiva (importación Excel/CSV). Resuelve primero los grupos y mesas únicos
- * presentes en el lote para no golpear la base de datos una vez por fila, y hace una
- * única inserción masiva de invitados.
+ * presentes en el lote para no golpear la base de datos una vez por fila.
+ *
+ * Importante: D1 limita cada consulta a 100 parámetros vinculados (no son 999 como en
+ * SQLite normal). Cada invitado tiene 12 columnas, así que un solo INSERT con más de ~8
+ * invitados ya supera ese límite y D1 lo rechaza con "too many SQL variables" — por eso
+ * fallaba con 50 invitados pero no con pocos. Se trocea en lotes seguros y se envían todos
+ * juntos como un batch (una sola ida y vuelta a D1, no N peticiones secuenciales).
  */
 export async function bulkCreateGuests(eventId: string, inputs: ImportGuestRowInput[]) {
   const db = getDb();
@@ -122,7 +127,22 @@ export async function bulkCreateGuests(eventId: string, inputs: ImportGuestRowIn
     rsvpStatus: "pending" as const,
   }));
 
-  await db.insert(guests).values(rows);
+  const COLUMNS_PER_ROW = 12;
+  const MAX_BOUND_PARAMS = 100;
+  const CHUNK_SIZE = Math.floor(MAX_BOUND_PARAMS / COLUMNS_PER_ROW); // 8 filas por statement
+
+  const chunks: (typeof rows)[] = [];
+  for (let i = 0; i < rows.length; i += CHUNK_SIZE) {
+    chunks.push(rows.slice(i, i + CHUNK_SIZE));
+  }
+
+  if (chunks.length <= 1) {
+    if (rows.length > 0) await db.insert(guests).values(rows);
+  } else {
+    const statements = chunks.map((chunk) => db.insert(guests).values(chunk));
+    await db.batch(statements as [typeof statements[number], ...typeof statements]);
+  }
+
   return { inserted: rows.length };
 }
 
